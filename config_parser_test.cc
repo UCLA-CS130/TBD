@@ -29,20 +29,6 @@ TEST(NginxConfigStatementTest, ToStringTest) {
 	EXPECT_EQ("foo bar;\n", statement.ToString(0));
 }
 
-/* TODO
-TEST(NginxConfigTest, ToStringTest) {
-	NginxConfigStatement statement;
-	statement.tokens_.push_back("foo");
-	statement.tokens_.push_back("bar");
-
-	NginxConfig config;
-	//std::shared_ptr<NginxConfigStatement> sharedPtr;
-	//sharedPtr.reset(&statement);
-	config.statements_.push_back(std::shared_ptr<NginxConfigStatement>(&statement));
-
-	EXPECT_EQ("foo bar;\n", config.ToString());
-} */
-
 TEST_F(NginxConfigParserStringTest, SimpleConfigTest) {
 	EXPECT_TRUE(ParseString("foo bar;"));
 	EXPECT_EQ(1, out_config.statements_.size());
@@ -65,11 +51,18 @@ TEST_F(NginxConfigParserStringTest, InvalidBlock2) {
 	EXPECT_FALSE(ParseString("location foo;}"));
 }
 
-TEST(NginxConfigParserTest, TestConfig) {
-  NginxConfigParser parser;
-  NginxConfig out_config;
+TEST_F(NginxConfigParserStringTest, NestedBlocks1) {
+	EXPECT_TRUE(ParseString("server { location { foo; }}"));
+}
 
-	bool test1 = parser.Parse("configtest", &out_config);
+TEST_F(NginxConfigParserStringTest, NestedBlocks2) {
+	EXPECT_TRUE(ParseString("server { location { foo; } bar; }"));
+}
 
-	EXPECT_TRUE(test1);
+TEST_F(NginxConfigParserStringTest, CommentTest1) {
+	EXPECT_FALSE(ParseString("# This will match any URI beginning with /forum"));
+}
+
+TEST_F(NginxConfigParserStringTest, CommentTest2) {
+	EXPECT_TRUE(ParseString("foo; # This will match any URI beginning with /forum"));
 }
