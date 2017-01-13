@@ -21,12 +21,23 @@ TEST(NginxConfigParserTest, SimpleConfig) {
   EXPECT_TRUE(success);
 }
 
-TEST(NginxConfigStatementTest, ToStringTest) {
+TEST(NginxConfigStatementTest, ToStringTest1) {
 	NginxConfigStatement statement;
 	statement.tokens_.push_back("foo");
 	statement.tokens_.push_back("bar");
 
 	EXPECT_EQ("foo bar;\n", statement.ToString(0));
+}
+
+TEST(NginxConfigStatementTest, ToStringTest2) {
+	NginxConfigStatement statement;
+	statement.tokens_.push_back("foo");
+	statement.tokens_.push_back("{");
+	statement.tokens_.push_back("bar");
+	statement.tokens_.push_back(";");
+	statement.tokens_.push_back("}");
+
+	EXPECT_EQ("foo { bar ; };\n", statement.ToString(0));
 }
 
 TEST_F(NginxConfigParserStringTest, SimpleConfigTest) {
@@ -41,6 +52,10 @@ TEST_F(NginxConfigParserStringTest, InvalidNormalString) {
 
 TEST_F(NginxConfigParserStringTest, ValidBlock) {
 	EXPECT_TRUE(ParseString("location { foo; }"));
+}
+
+TEST_F(NginxConfigParserStringTest, EmptyBlock) {
+	EXPECT_FALSE(ParseString("location { }"));
 }
 
 TEST_F(NginxConfigParserStringTest, InvalidBlock1) {
