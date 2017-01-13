@@ -21,7 +21,7 @@ TEST(NginxConfigParserTest, SimpleConfig) {
   EXPECT_TRUE(success);
 }
 
-TEST(NginxConfigStatementTest, ToStringTest1) {
+TEST(NginxConfigStatementTest, SimpleToStringTest) {
 	NginxConfigStatement statement;
 	statement.tokens_.push_back("foo");
 	statement.tokens_.push_back("bar");
@@ -29,7 +29,7 @@ TEST(NginxConfigStatementTest, ToStringTest1) {
 	EXPECT_EQ("foo bar;\n", statement.ToString(0));
 }
 
-TEST(NginxConfigStatementTest, ToStringTest2) {
+TEST(NginxConfigStatementTest, BlockToStringTest) {
 	NginxConfigStatement statement;
 	statement.tokens_.push_back("foo");
 	statement.tokens_.push_back("{");
@@ -58,26 +58,26 @@ TEST_F(NginxConfigParserStringTest, EmptyBlock) {
 	EXPECT_FALSE(ParseString("location { }"));
 }
 
-TEST_F(NginxConfigParserStringTest, InvalidBlock1) {
+TEST_F(NginxConfigParserStringTest, MoreOpenThanCloseBlock) {
 	EXPECT_FALSE(ParseString("location { foo;"));
 }
 
-TEST_F(NginxConfigParserStringTest, InvalidBlock2) {
+TEST_F(NginxConfigParserStringTest, MoreCloseThanOpenBlock) {
 	EXPECT_FALSE(ParseString("location foo;}"));
 }
 
-TEST_F(NginxConfigParserStringTest, NestedBlocks1) {
+TEST_F(NginxConfigParserStringTest, TwoConsecCloseBlocks) {
 	EXPECT_TRUE(ParseString("server { location { foo; }}"));
 }
 
-TEST_F(NginxConfigParserStringTest, NestedBlocks2) {
+TEST_F(NginxConfigParserStringTest, RegularNestedBlocks) {
 	EXPECT_TRUE(ParseString("server { location { foo; } bar; }"));
 }
 
-TEST_F(NginxConfigParserStringTest, CommentTest1) {
+TEST_F(NginxConfigParserStringTest, ConfigWithOnlyComment) {
 	EXPECT_FALSE(ParseString("# This will match any URI beginning with /forum"));
 }
 
-TEST_F(NginxConfigParserStringTest, CommentTest2) {
+TEST_F(NginxConfigParserStringTest, RegularConfigWithComment) {
 	EXPECT_TRUE(ParseString("foo; # This will match any URI beginning with /forum"));
 }
