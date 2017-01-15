@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <boost/asio.hpp>
+#include <boost/array.hpp>
 #include "config_parser.h"
 
 using boost::asio::ip::tcp;
@@ -24,10 +25,14 @@ int main(int argc, char* argv[]) {
       tcp::socket socket(io_service);
       std::cout << "server started" << std::endl;
       acceptor.accept(socket);
-      std::string message = make_daytime_string();
 
-      boost::system::error_code ignored_error;
-      boost::asio::write(socket, boost::asio::buffer(message), ignored_error);
+      //std::string message = make_daytime_string();
+      boost::array<char, 1024> buf;
+      boost::system::error_code error;
+      std::size_t len = socket.read_some(boost::asio::buffer(buf), error);
+
+      boost::asio::write(socket, boost::asio::buffer(buf, len), error);
+      std::cout << "write finished" << std::endl;
     }
   } catch (std::exception& e) {
     std::cerr << e.what() << std::endl;
