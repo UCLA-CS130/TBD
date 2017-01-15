@@ -4,3 +4,4 @@ gtest-all.o
 libgtest.a
 *.cc~
 *~
+server
