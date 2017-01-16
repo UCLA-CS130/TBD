@@ -4,5 +4,5 @@ class Server {
 	public:
 		Server() {};
 
-		bool runServer(char* filename);	
+		bool runServer(const char* filename);	
 };
