@@ -1,36 +1,32 @@
 #include <iostream>
 #include <string>
 #include <cstring>
-#include <boost/asio.hpp>
-#include "config_parser.h"
 #include "server.h"
 
 using boost::asio::ip::tcp;
 
 bool Server::runServer(const char* filename) {
     try {
-        NginxConfigParser configParser;
-        NginxConfig config;
         configParser.Parse(filename, &config);
-
-        boost::asio::io_service io_service;
+        // TODO: verify format of config file
         tcp::acceptor acceptor(io_service, tcp::endpoint(tcp::v4(), std::stoi(config.statements_[0]->tokens_[1])));
+
         for (;;) {
           tcp::socket socket(io_service);
           acceptor.accept(socket);
 
-          char buf[2048];
+          char request_buf[2048];
           boost::system::error_code error;
-          std::size_t len = socket.read_some(boost::asio::buffer(buf), error);
+          std::size_t request_len = socket.read_some(boost::asio::buffer(request_buf), error);
 
-          char response[4096] = "HTTP/1.1 200 OK\nContent-Type: text/plain\n\n";
+          char response_buf[4096] = "HTTP/1.1 200 OK\nContent-Type: text/plain\n\n";
 
-          if (len > 0) {
-            std::memcpy(&response[42], buf, len);
-            //std::cout << response << std::endl;
+          if (request_len > 0) {
+            std::memcpy(&response_buf[42], request_buf, request_len);
+            //std::cout << response_buf << std::endl;
           }
           
-          boost::asio::write(socket, boost::asio::buffer(response, 42 + len), error);
+          boost::asio::write(socket, boost::asio::buffer(response_buf, 42 + request_len), error);
           //std::cout << "write finished" << std::endl;
         }
         return true;
