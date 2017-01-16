@@ -7,7 +7,7 @@
 
 using boost::asio::ip::tcp;
 
-bool Server::runServer(char* filename) {
+bool Server::runServer(const char* filename) {
     try {
         NginxConfigParser configParser;
         NginxConfig config;
@@ -32,7 +32,7 @@ bool Server::runServer(char* filename) {
           
           boost::asio::write(socket, boost::asio::buffer(response, len), error);
           //std::cout << "write finished" << std::endl;
-
+          
           return true;
         }
     } catch (std::exception& e) {
