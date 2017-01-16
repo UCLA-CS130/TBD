@@ -19,22 +19,21 @@ bool Server::runServer(const char* filename) {
           tcp::socket socket(io_service);
           acceptor.accept(socket);
 
-          char buf[1024];
+          char buf[2048];
           boost::system::error_code error;
           std::size_t len = socket.read_some(boost::asio::buffer(buf), error);
 
-          char response[1024] = "HTTP/1.1 200 OK\nContent-Type: text/plain\n\n";
+          char response[4096] = "HTTP/1.1 200 OK\nContent-Type: text/plain\n\n";
 
           if (len > 0) {
-            std::memcpy(&response[43], buf, len);
+            std::memcpy(&response[42], buf, len);
             //std::cout << response << std::endl;
           }
           
-          boost::asio::write(socket, boost::asio::buffer(response, len), error);
+          boost::asio::write(socket, boost::asio::buffer(response, 42 + len), error);
           //std::cout << "write finished" << std::endl;
-          
-          return true;
         }
+        return true;
     } catch (std::exception& e) {
         std::cerr << e.what() << std::endl;
     }
