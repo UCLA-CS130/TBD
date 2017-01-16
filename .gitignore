@@ -5,3 +5,4 @@ libgtest.a
 *.cc~
 *~
 server
+server_test
