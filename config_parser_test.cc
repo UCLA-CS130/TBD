@@ -81,3 +81,11 @@ TEST_F(NginxConfigParserStringTest, ConfigWithOnlyComment) {
 TEST_F(NginxConfigParserStringTest, RegularConfigWithComment) {
 	EXPECT_TRUE(ParseString("foo; # This will match any URI beginning with /forum"));
 }
+
+TEST_F(NginxConfigParserStringTest, TestQuotes) {
+	EXPECT_TRUE(ParseString("location \"america\";"));
+}
+
+TEST_F(NginxConfigParserStringTest, TestUnevenQuotes) {
+	EXPECT_FALSE(ParseString("location \"america;"));
+}
