@@ -9,7 +9,7 @@ bool Server::runServer(const char* filename) {
     try {
         configParser.Parse(filename, &config);
         // TODO: verify format of config file
-        tcp::acceptor acceptor(io_service, tcp::endpoint(tcp::v4(), std::stoi(config.statements_[0]->tokens_[1])));
+        tcp::acceptor acceptor(io_service, tcp::endpoint(tcp::v4(), std::stoi(getConfigValue("port"))));
 
         for (;;) {
           tcp::socket socket(io_service);
@@ -34,4 +34,13 @@ bool Server::runServer(const char* filename) {
         std::cerr << e.what() << std::endl;
     }
     return false;
+}
+
+// TODO: implementation is enough for Assignment 2, but still need further implementation
+std::string Server::getConfigValue(std::string configName) {
+    for (int i = 0; i < config.statements_.size(); i++) {
+        if (config.statements_[i]->tokens_[0] == configName)
+            return config.statements_[i]->tokens_[1];
+    }
+    return "";
 }
