@@ -9,7 +9,13 @@ bool Server::runServer(const char* filename) {
     try {
         configParser.Parse(filename, &config);
         // TODO: verify format of config file
-        tcp::acceptor acceptor(io_service, tcp::endpoint(tcp::v4(), std::stoi(getConfigValue("port"))));
+        int port = std::stoi(getConfigValue("port"));
+        if (port < 1024) {
+            std::cerr << "The web server port number must be greater than 1023." << std::endl;
+            return false;
+        }
+
+        tcp::acceptor acceptor(io_service, tcp::endpoint(tcp::v4(), port));
 
         for (;;) {
           tcp::socket socket(io_service);
@@ -31,7 +37,11 @@ bool Server::runServer(const char* filename) {
         }
         return true;
     } catch (std::exception& e) {
-        std::cerr << e.what() << std::endl;
+        std::string errorMsg = "Error: ";
+        if (std::string(e.what()) == "stoi")
+            errorMsg += "The port must be a valid number greater than 1023";
+
+        std::cerr << errorMsg << std::endl;
     }
     return false;
 }
