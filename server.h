@@ -1,7 +1,10 @@
+#ifndef SERVER_H
+#define SERVER_H
+
 #include <iostream>
 #include <string>
-#include "config_parser.h"
 #include <boost/asio.hpp>
+#include "config_parser.h"
 
 class Server {
 	public:
@@ -13,3 +16,5 @@ class Server {
         NginxConfig config;
         boost::asio::io_service io_service;
 };
+
+#endif
