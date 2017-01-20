@@ -2,6 +2,7 @@
 #include <string>
 #include <cstring>
 #include "server.h"
+#include "config_parser.h"
 
 using boost::asio::ip::tcp;
 
@@ -29,11 +30,9 @@ bool Server::runServer(const char* filename) {
 
           if (request_len > 0) {
             std::memcpy(&response_buf[42], request_buf, request_len);
-            //std::cout << response_buf << std::endl;
           }
           
           boost::asio::write(socket, boost::asio::buffer(response_buf, 42 + request_len), error);
-          //std::cout << "write finished" << std::endl;
         }
         return true;
     } catch (std::exception& e) {
@@ -48,7 +47,7 @@ bool Server::runServer(const char* filename) {
 
 // TODO: implementation is enough for Assignment 2, but still need further implementation
 std::string Server::getConfigValue(std::string configName) {
-    for (int i = 0; i < config.statements_.size(); i++) {
+    for (size_t i = 0; i < config.statements_.size(); i++) {
         if (config.statements_[i]->tokens_[0] == configName)
             return config.statements_[i]->tokens_[1];
     }
