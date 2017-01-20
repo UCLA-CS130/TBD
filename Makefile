@@ -1,14 +1,15 @@
 # Points to the root of Google Test, relative to where this file is.
 # Remember to tweak this if you move this file.
 GTEST_DIR=googletest/googletest
+GMOCK_DIR=googletest/googlemock
 
 # Flags passed to the preprocessor.
 # Set Google Test's header directory as a system directory, such that
 # the compiler doesn't generate warnings in Google Test headers.
-CPPFLAGS += -isystem $(GTEST_DIR)/include
+CPPFLAGS += -isystem $(GTEST_DIR)/include -isystem $(GMOCK_DIR)/include
 
 # Flags passed to the C++ compiler.
-CXXFLAGS += -g -Wall -Wextra -pthread -std=c++0x -lboost_system
+CXXFLAGS += -g -Wall -Wextra -pthread -std=c++0x
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -16,11 +17,17 @@ GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 				$(GTEST_DIR)/include/gtest/internal/*.h
 
 
+GMOCK_HEADERS = $(GMOCK_DIR)/include/gmock/*.h \
+                $(GMOCK_DIR)/include/gmock/internal/*.h \
+				$(GTEST_HEADERS)
+
 # Builds gtest.a and gtest_main.a.
 
 # Usually you shouldn't tweak such internal variables, indicated by a
 # trailing _.
 GTEST_SRCS_ = $(GTEST_DIR)/src/*.cc $(GTEST_DIR)/src/*.h $(GTEST_HEADERS)
+GMOCK_SRCS_ = $(GMOCK_DIR)/src/*.cc $(GMOCK_HEADERS)
+
 
 all: server config_parser
 
@@ -51,6 +58,26 @@ gtest.a : gtest-all.o
 gtest_main.a : gtest-all.o gtest_main.o
 	$(AR) $(ARFLAGS) $@ $^
 
+gmock-all.o : $(GMOCK_SRCS_)
+	$(CXX) $(CPPFLAGS) -I$(GTEST_DIR) -I$(GMOCK_DIR) $(CXXFLAGS) \
+			-c $(GMOCK_DIR)/src/gmock-all.cc
+
+gmock_main.o : $(GMOCK_SRCS_)
+	$(CXX) $(CPPFLAGS) -I$(GTEST_DIR) -I$(GMOCK_DIR) $(CXXFLAGS) \
+            -c $(GMOCK_DIR)/src/gmock_main.cc
+
+gmock.a : gmock-all.o gtest-all.o
+	$(AR) $(ARFLAGS) $@ $^
+
+gmock_main.a : gmock-all.o gtest-all.o gmock_main.o
+	$(AR) $(ARFLAGS) $@ $^
+
+server_test.o : server_test.cc $(GMOCK_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c server_test.cc
+
+server_test : server_test.o gmock_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
+
 config_parser.o : config_parser.cc config_parser.h $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c config_parser.cc
 
@@ -58,15 +85,6 @@ config_parser_test.o : config_parser_test.cc config_parser.h $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c config_parser_test.cc
 
 config_parser_test : config_parser.o config_parser_test.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
-
-server.o : server.cc server.h $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c server.cc
-
-server_test.o : server_test.cc server.h $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c server_test.cc
-
-server_test : server.o server_test.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
 test : config_parser_test server_test
