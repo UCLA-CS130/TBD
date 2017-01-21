@@ -72,10 +72,13 @@ gmock.a : gmock-all.o gtest-all.o
 gmock_main.a : gmock-all.o gtest-all.o gmock_main.o
 	$(AR) $(ARFLAGS) $@ $^
 
-server_test.o : server_test.cc $(GMOCK_HEADERS)
+server.o : server.cc server.h $(GMOCK_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c server.cc
+
+server_test.o : server_test.cc server.h $(GMOCK_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c server_test.cc
 
-server_test : server_test.o gmock_main.a
+server_test : config_parser.o server.o server_test.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
 config_parser.o : config_parser.cc config_parser.h $(GTEST_HEADERS)
