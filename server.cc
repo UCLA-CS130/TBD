@@ -2,15 +2,18 @@
 #include <string>
 #include <cstring>
 #include "server.h"
-#include "config_parser.h"
 
 using boost::asio::ip::tcp;
+
+Server::Server() {}
+
+Server::~Server() {}
 
 bool Server::runServer(const char* filename) {
     try {
         configParser.Parse(filename, &config);
         // TODO: verify format of config file
-        int port = std::stoi(getConfigValue("port"));
+        int port = std::stoi(config.getConfigValue("port"));
         if (port < 1024) {
             std::cerr << "The web server port number must be greater than 1023." << std::endl;
             return false;
@@ -43,13 +46,4 @@ bool Server::runServer(const char* filename) {
         std::cerr << errorMsg << std::endl;
     }
     return false;
-}
-
-// TODO: implementation is enough for Assignment 2, but still need further implementation
-std::string Server::getConfigValue(std::string configName) {
-    for (size_t i = 0; i < config.statements_.size(); i++) {
-        if (config.statements_[i]->tokens_[0] == configName)
-            return config.statements_[i]->tokens_[1];
-    }
-    return "";
 }
