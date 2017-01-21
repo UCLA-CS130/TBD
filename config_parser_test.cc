@@ -21,6 +21,29 @@ TEST(NginxConfigParserTest, SimpleConfig) {
   EXPECT_TRUE(success);
 }
 
+TEST(NginxConfigTest, ToStringTest) {
+	NginxConfig config;
+	std::shared_ptr<NginxConfigStatement> ptr(new NginxConfigStatement);
+	config.statements_.push_back(ptr);
+
+	config.statements_[0]->tokens_.push_back("port");
+	config.statements_[0]->tokens_.push_back("8080");
+
+	EXPECT_EQ("port 8080;\n", config.ToString(0));
+}
+
+TEST(NginxConfigTest, GetConfigValueTest) {
+	NginxConfig config;
+	std::shared_ptr<NginxConfigStatement> ptr(new NginxConfigStatement);
+	config.statements_.push_back(ptr);
+
+	config.statements_[0]->tokens_.push_back("port");
+	config.statements_[0]->tokens_.push_back("8080");
+
+	EXPECT_EQ("8080", config.getConfigValue("port"));
+	EXPECT_EQ("", config.getConfigValue("dog"));
+}
+
 TEST(NginxConfigStatementTest, SimpleToStringTest) {
 	NginxConfigStatement statement;
 	statement.tokens_.push_back("foo");
