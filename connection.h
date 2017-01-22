@@ -13,9 +13,10 @@ public:
     tcp::socket& socket();
     void start();
 private:
-    static const int MAX_LENGTH = 1024;
+    static const int MAX_LENGTH = 2048;
     void handle_read(const boost::system::error_code& error, size_t bytes_transferred);
     void handle_write(const boost::system::error_code& error);
+    void copyRequest(char* response, size_t bytes_transferred);
     tcp::socket socket_;
     char data_[MAX_LENGTH];
 };
