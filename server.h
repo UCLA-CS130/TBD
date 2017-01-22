@@ -1,20 +1,20 @@
 #ifndef SERVER_H
 #define SERVER_H
 
-#include <iostream>
 #include <string>
 #include <boost/asio.hpp>
 #include "config_parser.h"
+#include "connection.h"
 
 class Server {
 public:
-	Server();
+	Server(boost::asio::io_service& io_service, int port);
     virtual ~Server();
-	virtual bool runServer(const char* filename);
 private:
-    NginxConfigParser configParser;
-    NginxConfig config;
-    boost::asio::io_service io_service;
+    void start_accept();
+    void handle_accept(Connection* new_connection, const boost::system::error_code& error);
+    boost::asio::io_service& io_service_;
+    tcp::acceptor acceptor_;
 };
 
 #endif

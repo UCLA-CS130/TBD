@@ -5,45 +5,27 @@
 
 using boost::asio::ip::tcp;
 
-Server::Server() {}
+Server::Server(boost::asio::io_service& io_service, int port) 
+    : io_service_(io_service), acceptor_(io_service, tcp::endpoint(tcp::v4(), port)) {
+    start_accept();
+}
 
 Server::~Server() {}
 
-bool Server::runServer(const char* filename) {
-    try {
-        configParser.Parse(filename, &config);
-        // TODO: verify format of config file
-        int port = std::stoi(config.getConfigValue("port"));
-        if (port < 1024) {
-            std::cerr << "The web server port number must be greater than 1023." << std::endl;
-            return false;
-        }
+void Server::start_accept() {
+    Connection* new_connection = new Connection(io_service_);
 
-        tcp::acceptor acceptor(io_service, tcp::endpoint(tcp::v4(), port));
+    acceptor_.async_accept(new_connection->socket(),
+                            boost::bind(&Server::handle_accept, this, new_connection,
+                            boost::asio::placeholders::error));
+}
 
-        for (;;) {
-          tcp::socket socket(io_service);
-          acceptor.accept(socket);
-
-          char request_buf[2048];
-          boost::system::error_code error;
-          std::size_t request_len = socket.read_some(boost::asio::buffer(request_buf), error);
-
-          char response_buf[4096] = "HTTP/1.1 200 OK\nContent-Type: text/plain\n\n";
-
-          if (request_len > 0) {
-            std::memcpy(&response_buf[42], request_buf, request_len);
-          }
-          
-          boost::asio::write(socket, boost::asio::buffer(response_buf, 42 + request_len), error);
-        }
-        return true;
-    } catch (std::exception& e) {
-        std::string errorMsg = "Error: ";
-        if (std::string(e.what()) == "stoi")
-            errorMsg += "The port must be a valid number greater than 1023";
-
-        std::cerr << errorMsg << std::endl;
+void Server::handle_accept(Connection* new_connection, const boost::system::error_code& error) {
+    if (!error) {
+      new_connection->start();
+    } else {
+        delete new_connection;
     }
-    return false;
+
+    start_accept();
 }
