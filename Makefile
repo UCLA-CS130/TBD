@@ -35,7 +35,7 @@ clean:
 	rm config_parser config_parser_test server server_test *.o *.a
 
 server: server.cc config_parser.cc
-	g++ -std=c++0x -o server server.cc server_main.cc config_parser.cc -lboost_system
+	g++ -std=c++0x -o server server.cc server_main.cc connection.cc config_parser.cc -lboost_system
 
 config_parser: config_parser.cc config_parser_main.cc
 	g++ config_parser.cc config_parser_main.cc -std=c++0x -g -Wall -o config_parser
