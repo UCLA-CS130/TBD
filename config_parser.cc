@@ -25,10 +25,13 @@ std::string NginxConfig::ToString(int depth) {
   return serialized_config;
 }
 
+// Given a config name, return the value of that config
 std::string NginxConfig::getConfigValue(std::string configName) {
   for (size_t i = 0; i < statements_.size(); i++) {
     if (statements_[i]->tokens_[0] == configName)
       return statements_[i]->tokens_[1];
+
+    // search in child block
     if (statements_[i]->child_block_ != nullptr) {
       std::string childRes = statements_[i]->child_block_->getConfigValue(configName);
       if (childRes != "")

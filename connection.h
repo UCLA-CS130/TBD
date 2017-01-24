@@ -16,7 +16,7 @@ private:
     static const int MAX_LENGTH = 2048;
     void handle_read(const boost::system::error_code& error, size_t bytes_transferred);
     void closeSocket(const boost::system::error_code& error);
-    void copyRequest(char* response, size_t bytes_transferred);
+    void copyRequest(char* response, size_t bytes_transferred, size_t headerLength);
     tcp::socket socket_;
     char data_[MAX_LENGTH];
 };

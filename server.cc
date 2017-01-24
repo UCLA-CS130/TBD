@@ -12,6 +12,7 @@ Server::Server(boost::asio::io_service& io_service, int port)
 
 Server::~Server() {}
 
+// asynchronously accepts new web connection requests
 void Server::start_accept() {
     Connection* new_connection = new Connection(io_service_);
 
@@ -20,12 +21,15 @@ void Server::start_accept() {
                             boost::asio::placeholders::error));
 }
 
+// handler after connection has been accepted
+// will begin the new connection
 void Server::handle_accept(Connection* new_connection, const boost::system::error_code& error) {
     if (!error) {
-      new_connection->start();
+        new_connection->start();
     } else {
         delete new_connection;
     }
 
+    // continue to listen for new connections
     start_accept();
 }
