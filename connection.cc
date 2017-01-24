@@ -20,14 +20,14 @@ void Connection::handle_read(const boost::system::error_code& error, size_t byte
         copyRequest(response, bytes_transferred);
         boost::asio::async_write(socket_,
             boost::asio::buffer(response, bytes_transferred + 42),
-            boost::bind(&Connection::handle_write, this,
+            boost::bind(&Connection::closeSocket, this,
             boost::asio::placeholders::error));
     } else {
         delete this;
     }
 }
 
-void Connection::handle_write(const boost::system::error_code& error) {
+void Connection::closeSocket(const boost::system::error_code& error) {
     if (!error) {
         socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_send);
         socket_.close();
