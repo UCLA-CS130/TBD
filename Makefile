@@ -32,7 +32,7 @@ GMOCK_SRCS_ = $(GMOCK_DIR)/src/*.cc $(GMOCK_HEADERS)
 all: server config_parser
 
 clean:
-	rm config_parser config_parser_test server server_test connection_test *.o *.a
+	rm -f config_parser config_parser_test server server_test connection_test *.o *.a *.gcno
 
 server: server.cc config_parser.cc
 	g++ -std=c++0x -o server server.cc server_main.cc connection.cc config_parser.cc -lboost_system
@@ -100,3 +100,6 @@ config_parser_test : config_parser.o config_parser_test.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
 test : config_parser_test server_test connection_test
+
+coverage : CXXFLAGS += -fprofile-arcs -ftest-coverage
+coverage : server_test

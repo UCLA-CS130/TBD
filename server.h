@@ -10,9 +10,9 @@ class Server {
 public:
 	Server(boost::asio::io_service& io_service, int port);
     virtual ~Server();
+    bool handle_accept(Connection* new_connection, const boost::system::error_code& error);
 private:
     void start_accept();
-    void handle_accept(Connection* new_connection, const boost::system::error_code& error);
     boost::asio::io_service& io_service_;
     tcp::acceptor acceptor_;
 };

@@ -1,7 +1,6 @@
 config_parser
-config_parser_test
 *.o
 *.a
 *~
 server
-server_test
+*_test
