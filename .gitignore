@@ -4,3 +4,6 @@ config_parser
 *~
 server
 *_test
+*.gcda
+*.gcno
+*.gcov

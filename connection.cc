@@ -39,7 +39,6 @@ bool Connection::handle_read(const boost::system::error_code& error, size_t byte
 // shutdown and close socket after responding to request
 bool Connection::closeSocket(const boost::system::error_code& error) {
     if (!error) {
-        socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_send);
         socket_.close();
         return true;
     } else {

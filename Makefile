@@ -100,6 +100,8 @@ config_parser_test : config_parser.o config_parser_test.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
 test : config_parser_test server_test connection_test
+	./config_parser_test; ./server_test; ./connection_test
 
 coverage : CXXFLAGS += -fprofile-arcs -ftest-coverage
-coverage : server_test
+coverage : server_test connection_test
+	./server_test && gcov -r server.cc; ./connection_test && gcov -r connection.cc
