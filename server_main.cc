@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
 
         // start server and wait for requests
         boost::asio::io_service io_service;
-        Server server(io_service, std::stoi(config.getConfigValue("port")));
+        Server server(io_service, std::stoi(config.getConfigValue("listen")));
         io_service.run();
     } catch (std::exception& e) {
         std::cerr << e.what() << std::endl;
