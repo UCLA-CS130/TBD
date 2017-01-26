@@ -2,20 +2,23 @@
 #include "gmock/gmock.h"
 #include "server.h"
 
-TEST(ServerTest, HandleAcceptSuccess) {
+class ServerTest : public ::testing::Test {
+protected:
+    bool handleAccept(boost::system::error_code err) {
+        conn = new Connection(io_service);
+        Server server(io_service, 8080);
+        return server.handle_accept(conn, err);
+    }
+    Connection* conn;
     boost::asio::io_service io_service;
-	Server server(io_service, 8080);
-	Connection conn(io_service);
-    boost::system::error_code err = boost::system::errc::make_error_code(boost::system::errc::success);
+};
 
-    EXPECT_TRUE(server.handle_accept(&conn, err));
+TEST_F(ServerTest, HandleAcceptSuccess) {
+    boost::system::error_code err = boost::system::errc::make_error_code(boost::system::errc::success);
+    EXPECT_TRUE(handleAccept(err));
 }
 
-TEST(ServerTest, HandleAcceptFail) {
-    boost::asio::io_service io_service;
-    Server server(io_service, 8080);
-    Connection conn(io_service);
+TEST_F(ServerTest, HandleAcceptFail) {
     boost::system::error_code err = boost::system::errc::make_error_code(boost::system::errc::bad_file_descriptor);
-
-    EXPECT_FALSE(server.handle_accept(&conn, err));
+    EXPECT_FALSE(handleAccept(err));
 }

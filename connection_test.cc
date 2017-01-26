@@ -5,13 +5,14 @@
 class ConnectionTest : public ::testing::Test {
 protected:
     bool handleRead(boost::system::error_code err) {
-        Connection conn(io_service);
-        return conn.handle_read(err, 24);
+        conn = new Connection(io_service);
+        return conn->handle_read(err, 24);
     }
     bool handleWrite(boost::system::error_code err) {
-        Connection conn(io_service);
-        return conn.closeSocket(err);
+        conn = new Connection(io_service);
+        return conn->closeSocket(err);
     }
+    Connection* conn;
     boost::asio::io_service io_service;
 };
 
