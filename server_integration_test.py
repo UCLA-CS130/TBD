@@ -1,4 +1,8 @@
 import subprocess
+import os.path
+
+if not os.path.exists("server"):
+    subprocess.check_call("make server", stdout=subprocess.PIPE, shell=True)
 
 run_server_command = "./server example_config"
 server_proc = subprocess.Popen(run_server_command, stdout=subprocess.PIPE, shell=True)
