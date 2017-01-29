@@ -5,6 +5,17 @@ server_proc = subprocess.Popen(run_server_command, stdout=subprocess.PIPE, shell
 
 run_curl_command = "curl -i localhost:8080"
 curl_proc = subprocess.Popen(run_curl_command, stdout=subprocess.PIPE, shell=True)
-print(curl_proc.stdout.read())
+response = curl_proc.stdout.read().decode('utf-8')
 
-server_proc.terminate()
+expected_response = """HTTP/1.1 200 OK
+Content-Type: text/plain
+
+GET / HTTP/1.1\r
+User-Agent: curl/7.35.0\r
+Host: localhost:8080\r
+Accept: */*\r\n\r\n"""
+
+if response != expected_response:
+	print("Incorrect response")
+else:
+	print("Correct response")
