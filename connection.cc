@@ -23,11 +23,11 @@ void Connection::start() {
 bool Connection::handle_read(const boost::system::error_code& error, size_t bytes_transferred) {
     if (!error) {
         char response[2048] = "HTTP/1.1 200 OK\nContent-Type: text/plain\n\n";
-        size_t headerLength = std::strlen(response);
-        copyRequest(response, bytes_transferred, headerLength);
+        size_t header_length = std::strlen(response);
+        copy_request(response, bytes_transferred, header_length);
         boost::asio::async_write(socket_,
-            boost::asio::buffer(response, bytes_transferred + headerLength),
-            boost::bind(&Connection::closeSocket, this,
+            boost::asio::buffer(response, bytes_transferred + header_length),
+            boost::bind(&Connection::close_socket, this,
             boost::asio::placeholders::error));
         return true;
     } else {
@@ -37,7 +37,7 @@ bool Connection::handle_read(const boost::system::error_code& error, size_t byte
 }
 
 // shutdown and close socket after responding to request
-bool Connection::closeSocket(const boost::system::error_code& error) {
+bool Connection::close_socket(const boost::system::error_code& error) {
     if (!error) {
         socket_.close();
         return true;
@@ -48,6 +48,6 @@ bool Connection::closeSocket(const boost::system::error_code& error) {
 }
 
 // construct response by placing request after headers
-void Connection::copyRequest(char* response, size_t bytes_transferred, size_t headerLength) {
-    std::memcpy(&response[headerLength], data_, bytes_transferred);
+void Connection::copy_request(char* response, size_t bytes_transferred, size_t header_length) {
+    std::memcpy(&response[header_length], data_, bytes_transferred);
 }

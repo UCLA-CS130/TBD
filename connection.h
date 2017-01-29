@@ -14,10 +14,10 @@ public:
     tcp::socket& socket();
     void start();
     bool handle_read(const boost::system::error_code& error, size_t bytes_transferred);
-    bool closeSocket(const boost::system::error_code& error);
+    bool close_socket(const boost::system::error_code& error);
 private:
     static const int MAX_LENGTH = 2048;
-    void copyRequest(char* response, size_t bytes_transferred, size_t headerLength);
+    void copy_request(char* response, size_t bytes_transferred, size_t header_length);
     tcp::socket socket_;
     char data_[MAX_LENGTH];
 };

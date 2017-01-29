@@ -4,13 +4,13 @@
 
 class ConnectionTest : public ::testing::Test {
 protected:
-    bool handleRead(boost::system::error_code err) {
+    bool handle_read(boost::system::error_code err) {
         conn = new Connection(io_service);
         return conn->handle_read(err, 24);
     }
-    bool handleWrite(boost::system::error_code err) {
+    bool handle_write(boost::system::error_code err) {
         conn = new Connection(io_service);
-        return conn->closeSocket(err);
+        return conn->close_socket(err);
     }
     Connection* conn;
     boost::asio::io_service io_service;
@@ -18,20 +18,20 @@ protected:
 
 TEST_F(ConnectionTest, HandleReadSuccess) {
     boost::system::error_code err = boost::system::errc::make_error_code(boost::system::errc::success);
-    EXPECT_TRUE(handleRead(err));
+    EXPECT_TRUE(handle_read(err));
 }
 
 TEST_F(ConnectionTest, HandleReadFail) {
     boost::system::error_code err = boost::system::errc::make_error_code(boost::system::errc::bad_file_descriptor);
-    EXPECT_FALSE(handleRead(err));
+    EXPECT_FALSE(handle_read(err));
 }
 
 TEST_F(ConnectionTest, HandleWriteSuccess) {
     boost::system::error_code err = boost::system::errc::make_error_code(boost::system::errc::success);
-    EXPECT_TRUE(handleWrite(err));
+    EXPECT_TRUE(handle_write(err));
 }
 
 TEST_F(ConnectionTest, HandleWriteFail) {
     boost::system::error_code err = boost::system::errc::make_error_code(boost::system::errc::bad_file_descriptor);
-    EXPECT_FALSE(handleWrite(err));
+    EXPECT_FALSE(handle_write(err));
 }
