@@ -105,3 +105,6 @@ test : config_parser_test server_test connection_test
 coverage : CXXFLAGS += -fprofile-arcs -ftest-coverage
 coverage : server_test connection_test
 	./server_test && gcov -r server.cc; ./connection_test && gcov -r connection.cc
+
+integration : 
+	python server_integration_test.py
