@@ -1,11 +1,12 @@
 import subprocess
-import os.path
+import os
+import signal
 
 if not os.path.exists("server"):
     subprocess.check_call("make server", stdout=subprocess.PIPE, shell=True)
 
 run_server_command = "./server example_config"
-server_proc = subprocess.Popen(run_server_command, stdout=subprocess.PIPE, shell=True)
+server_proc = subprocess.Popen(run_server_command, stdout=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
 
 run_curl_command = "curl -i localhost:8080"
 curl_proc = subprocess.Popen(run_curl_command, stdout=subprocess.PIPE, shell=True)
@@ -19,7 +20,11 @@ User-Agent: curl/7.35.0\r
 Host: localhost:8080\r
 Accept: */*\r\n\r\n"""
 
+os.killpg(os.getpgid(server_proc.pid), signal.SIGTERM)
+
 if response != expected_response:
-	print("Incorrect response")
+    print("Server replied with an incorrect response.")
+    exit(1)
 else:
-	print("Correct response")
+    print("Server replied with the correct response. Successful test.")
+    exit(0)
