@@ -22,7 +22,7 @@ void Connection::start() {
 // echo back request with status and content-type
 bool Connection::handle_read(const boost::system::error_code& error, size_t bytes_transferred) {
     if (!error) {
-        char response[2048] = "HTTP/1.1 200 OK\nContent-Type: text/plain\n\n";
+        char response[MAX_LENGTH] = "HTTP/1.1 200 OK\nContent-Type: text/plain\n\n";
         size_t header_length = std::strlen(response);
         copy_request(response, bytes_transferred, header_length);
         boost::asio::async_write(socket_,
