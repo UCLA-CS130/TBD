@@ -23,13 +23,15 @@ void Server::start_accept() {
 
 // handler after connection has been accepted
 // will begin the new connection
-void Server::handle_accept(Connection* new_connection, const boost::system::error_code& error) {
+bool Server::handle_accept(Connection* new_connection, const boost::system::error_code& error) {
     if (!error) {
         new_connection->start();
     } else {
         delete new_connection;
+        return false;
     }
 
     // continue to listen for new connections
     start_accept();
+    return true;
 }

@@ -4,6 +4,8 @@
 
 using boost::asio::ip::tcp;
 
+Connection::~Connection() {}
+
 tcp::socket& Connection::socket() {
     return socket_;
 }
@@ -18,31 +20,34 @@ void Connection::start() {
 
 // handler for received requests
 // echo back request with status and content-type
-void Connection::handle_read(const boost::system::error_code& error, size_t bytes_transferred) {
+bool Connection::handle_read(const boost::system::error_code& error, size_t bytes_transferred) {
     if (!error) {
-        char response[2048] = "HTTP/1.1 200 OK\nContent-Type: text/plain\n\n";
-        size_t headerLength = std::strlen(response);
-        copyRequest(response, bytes_transferred, headerLength);
+        char response[MAX_LENGTH] = "HTTP/1.1 200 OK\nContent-Type: text/plain\n\n";
+        size_t header_length = std::strlen(response);
+        copy_request(response, bytes_transferred, header_length);
         boost::asio::async_write(socket_,
-            boost::asio::buffer(response, bytes_transferred + headerLength),
-            boost::bind(&Connection::closeSocket, this,
+            boost::asio::buffer(response, bytes_transferred + header_length),
+            boost::bind(&Connection::close_socket, this,
             boost::asio::placeholders::error));
+        return true;
     } else {
         delete this;
+        return false;
     }
 }
 
 // shutdown and close socket after responding to request
-void Connection::closeSocket(const boost::system::error_code& error) {
+bool Connection::close_socket(const boost::system::error_code& error) {
     if (!error) {
-        socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_send);
         socket_.close();
+        return true;
     } else {
         delete this;
+        return false;
     }
 }
 
 // construct response by placing request after headers
-void Connection::copyRequest(char* response, size_t bytes_transferred, size_t headerLength) {
-    std::memcpy(&response[headerLength], data_, bytes_transferred);
+void Connection::copy_request(char* response, size_t bytes_transferred, size_t header_length) {
+    std::memcpy(&response[header_length], data_, bytes_transferred);
 }
