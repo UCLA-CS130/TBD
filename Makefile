@@ -80,6 +80,12 @@ gmock_main.a : gmock-all.o gtest-all.o gmock_main.o
 request_handler.o : request_handler.cc
 	$(CXX) $(CXXFLAGS) -c request_handler.cc
 
+request_handler_test.o : request_handler_test.cc $(GMOCK_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c request_handler_test.cc
+
+request_handler_test : request_handler_test.o request_handler.o gmock_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
+
 echo_handler.o : echo_handler.cc
 	$(CXX) $(CXXFLAGS) -c echo_handler.cc
 
@@ -119,8 +125,8 @@ config_parser_test.o : config_parser_test.cc $(GTEST_HEADERS)
 config_parser_test : config_parser.o config_parser_test.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
-test : config_parser_test server_test connection_test echo_handler_test
-	./config_parser_test; ./server_test; ./connection_test; ./echo_handler_test
+test : config_parser_test server_test connection_test echo_handler_test request_handler_test
+	./config_parser_test; ./server_test; ./connection_test; ./echo_handler_test; ./request_handler_test
 
 coverage : CXXFLAGS += -fprofile-arcs -ftest-coverage
 coverage : server_test connection_test
