@@ -1,6 +1,11 @@
+/* Source:
+    http://www.boost.org/doc/libs/1_62_0/doc/html/boost_asio/example/cpp03/echo/async_tcp_echo_server.cpp
+*/
+
 #include <iostream>
 #include <cstring>
 #include "connection.h"
+#include "echo_handler.h"
 
 using boost::asio::ip::tcp;
 
@@ -14,19 +19,18 @@ tcp::socket& Connection::socket() {
 void Connection::start() {
     socket_.async_read_some(boost::asio::buffer(data_, MAX_LENGTH),
         boost::bind(&Connection::handle_read, this,
-        boost::asio::placeholders::error,
-        boost::asio::placeholders::bytes_transferred));
+        boost::asio::placeholders::error));
 }
 
 // handler for received requests
 // echo back request with status and content-type
-bool Connection::handle_read(const boost::system::error_code& error, size_t bytes_transferred) {
+bool Connection::handle_read(const boost::system::error_code& error) {
     if (!error) {
-        char response[MAX_LENGTH] = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n";
-        size_t header_length = std::strlen(response);
-        copy_request(response, bytes_transferred, header_length);
+        EchoHandler echo_handler(data_);
+        std::string response = echo_handler.constructResponse();
+        size_t response_length = response.size();
         boost::asio::async_write(socket_,
-            boost::asio::buffer(response, bytes_transferred + header_length),
+            boost::asio::buffer(response, response_length),
             boost::bind(&Connection::close_socket, this,
             boost::asio::placeholders::error));
         return true;
@@ -45,9 +49,4 @@ bool Connection::close_socket(const boost::system::error_code& error) {
         delete this;
         return false;
     }
-}
-
-// construct response by placing request after headers
-void Connection::copy_request(char* response, size_t bytes_transferred, size_t header_length) {
-    std::memcpy(&response[header_length], data_, bytes_transferred);
 }

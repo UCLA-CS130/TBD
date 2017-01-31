@@ -1,3 +1,7 @@
+/* Source:
+    http://www.boost.org/doc/libs/1_62_0/doc/html/boost_asio/example/cpp03/echo/async_tcp_echo_server.cpp
+*/
+
 #include <iostream>
 #include <string>
 #include <cstring>
@@ -5,8 +9,8 @@
 
 using boost::asio::ip::tcp;
 
-Server::Server(boost::asio::io_service& io_service, int port) 
-    : io_service_(io_service), acceptor_(io_service, tcp::endpoint(tcp::v4(), port)) {
+Server::Server(boost::asio::io_service& io_service, ServerConfig* server_config) 
+    : io_service_(io_service), acceptor_(io_service, tcp::endpoint(tcp::v4(), server_config->getPort())) {
     start_accept();
 }
 

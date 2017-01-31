@@ -5,8 +5,6 @@ class RequestHandler {
 public:
     RequestHandler() {};
     virtual ~RequestHandler() {};
-private:
-
 };
 
 #endif
