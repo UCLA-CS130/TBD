@@ -14,7 +14,7 @@ GMOCK_DIR=googletest/googlemock
 CPPFLAGS += -isystem $(GTEST_DIR)/include -isystem $(GMOCK_DIR)/include
 
 # Flags passed to the C++ compiler.
-CXXFLAGS += -g -Wall -Wextra -Werror -std=c++0x
+CXXFLAGS += -g -Wall -Wextra -Werror -pthread -std=c++0x
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -83,6 +83,12 @@ request_handler.o : request_handler.cc
 echo_handler.o : echo_handler.cc
 	$(CXX) $(CXXFLAGS) -c echo_handler.cc
 
+echo_handler_test.o : echo_handler_test.cc $(GMOCK_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c echo_handler_test.cc
+
+echo_handler_test : echo_handler_test.o echo_handler.o request_handler.o gmock_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
+
 connection.o : connection.cc
 	$(CXX) $(CXXFLAGS) -c connection.cc
 
@@ -113,8 +119,8 @@ config_parser_test.o : config_parser_test.cc $(GTEST_HEADERS)
 config_parser_test : config_parser.o config_parser_test.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
-test : config_parser_test server_test connection_test
-	./config_parser_test; ./server_test; ./connection_test
+test : config_parser_test server_test connection_test echo_handler_test
+	./config_parser_test; ./server_test; ./connection_test; ./echo_handler_test
 
 coverage : CXXFLAGS += -fprofile-arcs -ftest-coverage
 coverage : server_test connection_test
