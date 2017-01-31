@@ -1,13 +1,14 @@
 #include "echo_handler.h"
 
 EchoHandler::EchoHandler(char* request) {
-    request_ = request;
+    request_ = std::string(request);
 }
 
 EchoHandler::~EchoHandler() {}
 
-std::string EchoHandler::constructResponse() {
-    std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n";
-    response += std::string(request_);
+std::string EchoHandler::build_response() {
+    std::string response = build_status_line(200);
+    response += build_header("Content-Type", "text/plain");
+    response += "\r\n\r\n" + request_;
     return response;
 }

@@ -40,7 +40,7 @@ clean:
 	rm -f config_parser config_parser_test server server_test connection_test *.o *.a *.gcno *.gcda *.gcov
 
 server: server.cc config_parser.cc
-	g++ -std=c++0x -o server server.cc server_main.cc connection.cc config_parser.cc echo_handler.cc -lboost_system
+	g++ -std=c++0x -o server server.cc server_main.cc connection.cc config_parser.cc echo_handler.cc request_handler.cc -lboost_system
 
 config_parser: config_parser.cc config_parser_main.cc
 	g++ config_parser.cc config_parser_main.cc -std=c++0x -g -Wall -o config_parser
@@ -77,6 +77,9 @@ gmock.a : gmock-all.o gtest-all.o
 gmock_main.a : gmock-all.o gtest-all.o gmock_main.o
 	$(AR) $(ARFLAGS) $@ $^
 
+request_handler.o : request_handler.cc request_handler.h $(GMOCK_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c request_handler.cc
+
 echo_handler.o : echo_handler.cc echo_handler.h $(GMOCK_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c echo_handler.cc
 
@@ -86,7 +89,7 @@ connection.o : connection.cc connection.h $(GMOCK_HEADERS)
 connection_test.o : connection_test.cc connection.h $(GMOCK_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c connection_test.cc
 
-connection_test : connection_test.o connection.o echo_handler.o gmock_main.a
+connection_test : connection_test.o connection.o request_handler.o echo_handler.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
 server.o : server.cc server.h $(GMOCK_HEADERS)
@@ -95,7 +98,7 @@ server.o : server.cc server.h $(GMOCK_HEADERS)
 server_test.o : server_test.cc server.h $(GMOCK_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c server_test.cc
 
-server_test : config_parser.o server.o server_test.o connection.o echo_handler.o gmock_main.a
+server_test : config_parser.o server.o server_test.o connection.o request_handler.o echo_handler.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
 config_parser.o : config_parser.cc config_parser.h $(GTEST_HEADERS)
@@ -116,4 +119,3 @@ coverage : server_test connection_test
 
 integration : 
 	python server_integration_test.py
-	

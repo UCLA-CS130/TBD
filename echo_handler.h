@@ -7,9 +7,9 @@ class EchoHandler : public RequestHandler {
 public:
     EchoHandler(char* request);
     virtual ~EchoHandler();
-    virtual std::string constructResponse();
+    virtual std::string build_response();
 private:
-    char* request_;
+    std::string request_;
 };
 
 #endif
