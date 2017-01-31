@@ -14,7 +14,7 @@ GMOCK_DIR=googletest/googlemock
 CPPFLAGS += -isystem $(GTEST_DIR)/include -isystem $(GMOCK_DIR)/include
 
 # Flags passed to the C++ compiler.
-CXXFLAGS += -g -Wall -Wextra -Werror -pthread -std=c++0x
+CXXFLAGS += -g -Wall -Wextra -Werror -std=c++0x
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.

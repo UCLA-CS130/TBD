@@ -26,7 +26,8 @@ void Connection::start() {
 // echo back request with status and content-type
 bool Connection::handle_read(const boost::system::error_code& error) {
     if (!error) {
-        EchoHandler echo_handler(data_);
+        std::string data_string = std::string(data_);
+        EchoHandler echo_handler(data_string);
         std::string response = echo_handler.build_response();
         size_t response_length = response.size();
         boost::asio::async_write(socket_,
