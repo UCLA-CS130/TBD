@@ -8,7 +8,7 @@ protected:
         conn = new Connection(io_service);
         return conn->handle_read(err, bytes_transferred);
     }
-    bool handle_write(boost::system::error_code err) {
+    bool close_socket(boost::system::error_code err) {
         conn = new Connection(io_service);
         return conn->close_socket(err);
     }
@@ -27,12 +27,12 @@ TEST_F(ConnectionTest, HandleReadFail) {
     EXPECT_FALSE(handle_read(err));
 }
 
-TEST_F(ConnectionTest, HandleWriteSuccess) {
+TEST_F(ConnectionTest, CloseSocketSuccess) {
     boost::system::error_code err = boost::system::errc::make_error_code(boost::system::errc::success);
-    EXPECT_TRUE(handle_write(err));
+    EXPECT_TRUE(close_socket(err));
 }
 
-TEST_F(ConnectionTest, HandleWriteFail) {
+TEST_F(ConnectionTest, CloseSocketFail) {
     boost::system::error_code err = boost::system::errc::make_error_code(boost::system::errc::bad_file_descriptor);
-    EXPECT_FALSE(handle_write(err));
+    EXPECT_FALSE(close_socket(err));
 }
