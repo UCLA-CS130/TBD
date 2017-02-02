@@ -12,7 +12,7 @@ public:
 
 private:
     int port_;
-    std::unordered_map<std::string, std::string> path_map;
+    std::unordered_map<std::string, std::string> path_map_;
 };
 
 #endif

@@ -39,7 +39,7 @@ all: server
 clean:
 	rm -f config_parser config_parser_test server server_test connection_test *.o *.a *.gcno *.gcda *.gcov
 
-server: server_main.o server.o config_parser.o connection.o echo_handler.o request_handler.o
+server: server_main.o server.o config_parser.o connection.o echo_handler.o request_handler.o server_config.o
 	$(CXX) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
 config_parser: config_parser.cc config_parser_main.cc
@@ -95,6 +95,15 @@ echo_handler_test.o : echo_handler_test.cc $(GMOCK_HEADERS)
 echo_handler_test : echo_handler_test.o echo_handler.o request_handler.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
+server_config.o : server_config.cc
+	$(CXX) $(CXXFLAGS) -c server_config.cc
+
+server_config_test.o : server_config_test.cc $(GMOCK_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c server_config_test.cc
+
+server_config_test : server_config_test.o server_config.o config_parser.o gmock_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
+
 connection.o : connection.cc
 	$(CXX) $(CXXFLAGS) -c connection.cc
 
@@ -113,7 +122,7 @@ server.o : server.cc
 server_test.o : server_test.cc $(GMOCK_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c server_test.cc
 
-server_test : config_parser.o server.o server_test.o connection.o request_handler.o echo_handler.o gmock_main.a
+server_test : config_parser.o server.o server_test.o connection.o request_handler.o echo_handler.o server_config.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
 config_parser.o : config_parser.cc
@@ -125,8 +134,8 @@ config_parser_test.o : config_parser_test.cc $(GTEST_HEADERS)
 config_parser_test : config_parser.o config_parser_test.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
-test : config_parser_test server_test connection_test echo_handler_test request_handler_test
-	./config_parser_test; ./server_test; ./connection_test; ./echo_handler_test; ./request_handler_test
+test : config_parser_test server_test connection_test echo_handler_test request_handler_test server_config_test
+	./config_parser_test; ./server_test; ./connection_test; ./echo_handler_test; ./request_handler_test; ./server_config_test
 
 coverage : CXXFLAGS += -fprofile-arcs -ftest-coverage
 coverage : server_test connection_test
