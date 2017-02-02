@@ -25,7 +25,7 @@ public:
   std::string ToString(int depth = 0);
   std::vector<std::shared_ptr<NginxConfigStatement>> statements_;
   std::string getConfigValue(std::string configName);
-  std::unordered_map<std::string, std::string> get_path_map();
+  std::unordered_map<std::string, std::string> extract_path_map();
 };
 
 // The driver that parses a config file and generates an NginxConfig.

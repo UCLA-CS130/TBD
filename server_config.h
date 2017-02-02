@@ -3,6 +3,7 @@
 
 #include "config_parser.h"
 
+// TODO: add tests for server config
 class ServerConfig {
 public:
     ServerConfig(NginxConfig* config) {
@@ -18,20 +19,11 @@ public:
             exit(1);
         }
 
-        path_map = config->get_path_map();
-        std::cout << path_map["static1"] << std::endl;
-        std::cout << path_map["static2"] << std::endl;
-        std::cout << path_map.size() << std::endl;
-        static_base_path_ = config->getConfigValue("static_base_path");
-        std::cout << static_base_path_ << std::endl;
+        path_map = config->extract_path_map();
     }
 
     int getPort() {
         return port_;
-    }
-
-    std::string getStaticBasePath() {
-        return static_base_path_;
     }
 
     std::unordered_map<std::string, std::string> get_path_map() {
@@ -40,7 +32,6 @@ public:
 
 private:
     int port_;
-    std::string static_base_path_;
     std::unordered_map<std::string, std::string> path_map;
 };
 

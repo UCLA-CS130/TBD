@@ -43,7 +43,7 @@ std::string NginxConfig::getConfigValue(std::string configName) {
 }
 
 // Extract path mapping from config
-std::unordered_map<std::string, std::string> NginxConfig::get_path_map() {
+std::unordered_map<std::string, std::string> NginxConfig::extract_path_map() {
   std::unordered_map<std::string, std::string> map;
 
   for (size_t i = 0; i < statements_.size(); i++) {
@@ -57,7 +57,7 @@ std::unordered_map<std::string, std::string> NginxConfig::get_path_map() {
 
     // Search in child block
     if (statements_[i]->child_block_ != nullptr) {
-      std::unordered_map<std::string, std::string> child_res = statements_[i]->child_block_->get_path_map();
+      std::unordered_map<std::string, std::string> child_res = statements_[i]->child_block_->extract_path_map();
       if (!child_res.empty())
         return child_res;
     }
