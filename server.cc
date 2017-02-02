@@ -10,7 +10,7 @@
 using boost::asio::ip::tcp;
 
 Server::Server(boost::asio::io_service& io_service, ServerConfig* server_config) 
-    : io_service_(io_service), acceptor_(io_service, tcp::endpoint(tcp::v4(), server_config->getPort())) {
+    : io_service_(io_service), acceptor_(io_service, tcp::endpoint(tcp::v4(), server_config->get_port())) {
     start_accept();
 }
 
