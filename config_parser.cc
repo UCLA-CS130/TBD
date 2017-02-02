@@ -14,6 +14,7 @@
 #include <stack>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include "config_parser.h"
 
@@ -39,6 +40,30 @@ std::string NginxConfig::getConfigValue(std::string configName) {
     }
   }
   return "";
+}
+
+// Extract path mapping from config
+std::unordered_map<std::string, std::string> NginxConfig::get_path_map() {
+  std::unordered_map<std::string, std::string> map;
+
+  for (size_t i = 0; i < statements_.size(); i++) {
+    if (statements_[i]->tokens_[0] == "path") {
+      std::vector<std::shared_ptr<NginxConfigStatement>> statements = statements_[i]->child_block_->statements_;
+      for (size_t j = 0; j < statements.size(); j++) {
+        map[statements[j]->tokens_[0]] = statements[j]->tokens_[1];
+      }
+      return map;
+    }
+
+    // Search in child block
+    if (statements_[i]->child_block_ != nullptr) {
+      std::unordered_map<std::string, std::string> child_res = statements_[i]->child_block_->get_path_map();
+      if (!child_res.empty())
+        return child_res;
+    }
+  }
+
+  return map;
 }
 
 std::string NginxConfigStatement::ToString(int depth) {

@@ -7,6 +7,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 class NginxConfig;
 
@@ -24,6 +25,7 @@ public:
   std::string ToString(int depth = 0);
   std::vector<std::shared_ptr<NginxConfigStatement>> statements_;
   std::string getConfigValue(std::string configName);
+  std::unordered_map<std::string, std::string> get_path_map();
 };
 
 // The driver that parses a config file and generates an NginxConfig.

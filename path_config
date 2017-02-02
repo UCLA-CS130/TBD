@@ -1,0 +1,8 @@
+server {
+  listen   8080;
+  root /home/ubuntu/sites/foo/;
+  path {
+    static1 /home/;
+    static2 /other/dir/;
+  }
+}
