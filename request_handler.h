@@ -4,8 +4,8 @@
 
 class RequestHandler {
 public:
-    RequestHandler() {};
-    virtual ~RequestHandler() {};
+    RequestHandler();
+    virtual ~RequestHandler();
     static std::string build_status_line(int status_code);
     static std::string build_header(std::string field, std::string value);
 };

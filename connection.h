@@ -9,7 +9,7 @@ using boost::asio::ip::tcp;
 
 class Connection {
 public:
-    Connection(boost::asio::io_service& io_service) : socket_(io_service) {}
+    Connection(boost::asio::io_service& io_service);
     virtual ~Connection();
     tcp::socket& socket();
     void start();

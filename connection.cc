@@ -9,6 +9,8 @@
 
 using boost::asio::ip::tcp;
 
+Connection::Connection(boost::asio::io_service& io_service) : socket_(io_service) {}
+
 Connection::~Connection() {}
 
 tcp::socket& Connection::socket() {

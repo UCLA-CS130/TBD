@@ -1,5 +1,9 @@
 #include "request_handler.h"
 
+RequestHandler::RequestHandler() {}
+
+RequestHandler::~RequestHandler() {}
+
 std::string RequestHandler::build_status_line(int status_code) {
     std::string status_line = "HTTP/1.1";
 
