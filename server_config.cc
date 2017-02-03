@@ -1,6 +1,7 @@
 #include "server_config.h"
 
 ServerConfig::ServerConfig(NginxConfig* config) {
+    port_ = 0;
     std::string port_string = config->getConfigValue("listen");
     if (port_string != "") {
         port_ = std::stoi(config->getConfigValue("listen"));
