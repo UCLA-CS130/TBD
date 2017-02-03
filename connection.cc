@@ -6,6 +6,7 @@
 #include <cstring>
 #include "connection.h"
 #include "echo_handler.h"
+#include "http_request.h"
 
 using boost::asio::ip::tcp;
 
@@ -29,6 +30,9 @@ void Connection::start() {
 bool Connection::handle_read(const boost::system::error_code& error) {
     if (!error) {
         std::string data_string = std::string(data_);
+
+        HttpRequest http_request(data_string);
+
         EchoHandler echo_handler(data_string);
         std::string response = echo_handler.build_response();
         size_t response_length = response.size();
