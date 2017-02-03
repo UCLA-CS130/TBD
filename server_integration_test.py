@@ -15,9 +15,9 @@ run_curl_command = "curl -i localhost:8080"
 curl_proc = subprocess.Popen(run_curl_command, stdout=subprocess.PIPE, shell=True)
 response = curl_proc.stdout.read().decode('utf-8')
 
-expected_response = """HTTP/1.1 200 OK
-Content-Type: text/plain
-
+expected_response = """HTTP/1.1 200 OK\r
+Content-Type: text/plain\r
+\r
 GET / HTTP/1.1\r
 User-Agent: curl/7.35.0\r
 Host: localhost:8080\r
