@@ -9,7 +9,7 @@ public:
     HttpRequest(std::string request);
     void parse_request(std::string request);
     std::vector<std::string> split_lines(std::string request);
-private:
+    
     std::unordered_map<std::string, std::string> header_map_;
     std::string request_path_;
 };
