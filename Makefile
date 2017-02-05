@@ -104,11 +104,11 @@ config_parser_test : config_parser.o config_parser_test.o gtest_main.a
 http_request_test : http_request.o http_request_test.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
-static_file_handler_test : static_file_handler.o static_file_handler_test.o gmock_main.a
+static_file_handler_test : static_file_handler.o static_file_handler_test.o http_request.o request_handler.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
 TESTS = config_parser_test server_test connection_test echo_handler_test \
-		request_handler_test server_config_test http_request_test
+		request_handler_test server_config_test http_request_test static_file_handler_test
 test : $(TESTS)
 	for t in $^ ; do ./$$t ; done
 

@@ -28,7 +28,11 @@ std::string StaticFileHandler::build_response() {
 }
 
 std::string StaticFileHandler::get_mime_type() {
-    int pos = path_.find_last_of(".");
+    size_t pos = path_.find_last_of(".");
+    if (pos == std::string::npos) {
+        return "";
+    }
+
     std::string extension = path_.substr(pos);
     if (extension == ".html")
         return "text/html";
