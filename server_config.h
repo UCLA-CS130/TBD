@@ -3,7 +3,6 @@
 
 #include "config_parser.h"
 
-// TODO: add tests for server config
 class ServerConfig {
 public:
     ServerConfig(NginxConfig* config);

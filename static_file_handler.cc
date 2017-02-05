@@ -11,7 +11,7 @@ std::string StaticFileHandler::build_response() {
 
     std::string mime_type = get_mime_type();
     if (mime_type != "") {
-        file_content = read_file();    
+        file_content = read_file();
     }
     
     // TODO: distinguish empty file from cannot open

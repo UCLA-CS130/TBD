@@ -23,7 +23,7 @@ TEST_F(StaticFileHandlerTest, GetMimeTypeTestHTML) {
 }
 
 TEST_F(StaticFileHandlerTest, GetMimeTypeTestDefault) {
-    EXPECT_EQ("", get_mime_type("turtle"));
+    EXPECT_EQ("text/plain", get_mime_type("turtle"));
 }
 
 // TODO: Test read_file and build_response

@@ -23,13 +23,7 @@ std::unique_ptr<RequestHandler> HandlerFactory::create_handler() {
         std::cout << "in static!" << std::endl;
         std::string file_path = transform_path();
         std::cout << file_path << std::endl;
-        if (file_path == "") {
-            std::cout << "no matching path found" << std::endl;
-            // No matching path found
-            // handler = std::unique_ptr<RequestHandler>(new ErrorHandler(404));
-        } else {
-            handler = std::unique_ptr<RequestHandler>(new StaticFileHandler(file_path));
-        }
+        handler = std::unique_ptr<RequestHandler>(new StaticFileHandler(file_path));
     }
 
     return handler;
