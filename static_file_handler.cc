@@ -29,7 +29,7 @@ std::string StaticFileHandler::build_response() {
 std::string StaticFileHandler::get_mime_type() {
     size_t pos = file_path_.find_last_of(".");
     if (pos == std::string::npos) {
-        return "";
+        return "text/plain";
     }
 
     std::string extension = file_path_.substr(pos);

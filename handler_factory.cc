@@ -37,6 +37,9 @@ std::unique_ptr<RequestHandler> HandlerFactory::create_handler() {
 
 // TODO: handle mutliple matches
 std::string HandlerFactory::transform_path() {
+    // TODO: handle favicon, dont send it as binary
+    if (http_request_->request_path_ == "/favicon.ico") return "favicon.png";
+
     std::unordered_map<std::string, std::string> path_map = server_config_->get_path_map();
     std::string request_path = http_request_->request_path_;
 
