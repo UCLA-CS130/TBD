@@ -11,7 +11,9 @@
 
 using boost::asio::ip::tcp;
 
-Connection::Connection(boost::asio::io_service& io_service) : socket_(io_service) {}
+Connection::Connection(boost::asio::io_service& io_service, ServerConfig* server_config)
+    : socket_(io_service),
+      server_config_(server_config) {}
 
 Connection::~Connection() {}
 
