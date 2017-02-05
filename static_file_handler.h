@@ -8,13 +8,13 @@
 
 class StaticFileHandler : public RequestHandler {
 public:
-    StaticFileHandler(HttpRequest* http_request);
+    StaticFileHandler(std::string file_path);
     virtual ~StaticFileHandler();
     virtual std::string build_response();
     virtual std::string get_mime_type();
     virtual std::string read_file();
 private:
-    std::string path_;
+    std::string file_path_;
 };
 
 #endif

@@ -1,8 +1,7 @@
 #include "static_file_handler.h"
 
-StaticFileHandler::StaticFileHandler(HttpRequest* http_request) {
-    path_ = http_request->request_path_;
-}
+StaticFileHandler::StaticFileHandler(std::string file_path)
+    : file_path_(file_path) {}
 
 StaticFileHandler::~StaticFileHandler() {}
 
@@ -28,12 +27,12 @@ std::string StaticFileHandler::build_response() {
 }
 
 std::string StaticFileHandler::get_mime_type() {
-    size_t pos = path_.find_last_of(".");
+    size_t pos = file_path_.find_last_of(".");
     if (pos == std::string::npos) {
         return "";
     }
 
-    std::string extension = path_.substr(pos);
+    std::string extension = file_path_.substr(pos);
     if (extension == ".html")
         return "text/html";
     else if (extension == ".txt")
@@ -45,7 +44,7 @@ std::string StaticFileHandler::get_mime_type() {
 }
 
 std::string StaticFileHandler::read_file() {
-    boost::filesystem::ifstream fs(path_);
+    boost::filesystem::ifstream fs(file_path_);
     std::string line;
     std::string file_content;
     if (fs.is_open()) {
