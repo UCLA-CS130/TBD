@@ -8,6 +8,7 @@
 #include "echo_handler.h"
 #include "static_file_handler.h"
 #include "http_request.h"
+#include "handler_factory.h"
 
 using boost::asio::ip::tcp;
 
@@ -35,9 +36,13 @@ bool Connection::handle_read(const boost::system::error_code& error) {
         std::string data_string = std::string(data_);
 
         HttpRequest http_request(data_string);
-        StaticFileHandler static_file_handler(&http_request);
+        HandlerFactory handler_factory(server_config_, &http_request);
+        // StaticFileHandler static_file_handler(&http_request);
         //EchoHandler echo_handler(data_string);
-        std::string response = static_file_handler.build_response();
+        // std::string response = static_file_handler.build_response();
+        std::unique_ptr<RequestHandler> handler = handler_factory.create_handler();
+        std::string response = handler->build_response();
+
         size_t response_length = response.size();
         boost::asio::async_write(socket_,
             boost::asio::buffer(response, response_length),

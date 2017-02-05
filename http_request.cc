@@ -2,7 +2,8 @@
 #include <iostream>
 #include "http_request.h"
 
-HttpRequest::HttpRequest(std::string request) {
+HttpRequest::HttpRequest(std::string request)
+    : raw_request_string_(request) {
     parse_request(request);
 }
 
