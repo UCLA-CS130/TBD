@@ -11,10 +11,10 @@ public:
     StaticFileHandler(HttpRequest* http_request);
     virtual ~StaticFileHandler();
     virtual std::string build_response();
-    //virtual std::string get_mime_type();
+    virtual std::string get_mime_type();
     virtual std::string read_file();
 private:
-    boost::filesystem::path path_;
+    std::string path_;
 };
 
 #endif

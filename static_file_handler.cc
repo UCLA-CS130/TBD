@@ -1,22 +1,44 @@
 #include "static_file_handler.h"
 
 StaticFileHandler::StaticFileHandler(HttpRequest* http_request) {
-    path_ = boost::filesystem::path(http_request->request_path_);
+    path_ = http_request->request_path_;
 }
 
 StaticFileHandler::~StaticFileHandler() {}
 
 std::string StaticFileHandler::build_response() {
     std::string response = build_status_line(200);
-    std::string file_content = read_file();
-    response += build_header("Content-Type", "text/plain");
+    std::string file_content = "";
+
+    std::string mime_type = get_mime_type();
+    if (mime_type != "") {
+        file_content = read_file();    
+    }
+    
+    // TODO: distinguish empty file from cannot open
+    if (file_content == "") {
+        response = build_status_line(404);
+        mime_type = "text/plain";
+        file_content = "404 File Not Found\n";
+    }
+
+    response += build_header("Content-Type", mime_type);
     response += "\r\n" + file_content;
     return response;
 }
 
-/*std::string StaticFileHandler::get_mime_type() {
-    //if (path_.extension)
-}*/
+std::string StaticFileHandler::get_mime_type() {
+    int pos = path_.find_last_of(".");
+    std::string extension = path_.substr(pos);
+    if (extension == ".html")
+        return "text/html";
+    else if (extension == ".txt")
+        return "text/plain";
+    else if (extension == ".jpeg" || extension == ".jpg")
+        return "image/jpeg";
+    else
+        return "";
+}
 
 std::string StaticFileHandler::read_file() {
     boost::filesystem::ifstream fs(path_);
