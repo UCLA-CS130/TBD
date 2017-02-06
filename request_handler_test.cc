@@ -15,3 +15,8 @@ TEST(RequestHandlerTest, BuildHeaderTest) {
     RequestHandler request_handler;
     EXPECT_EQ("Content-type: text/plain\r\n", request_handler.build_header("Content-type", "text/plain"));
 }
+
+TEST(RequestHandlerTest, BuildResponseTest) {
+    RequestHandler request_handler;
+    EXPECT_EQ("", request_handler.build_response());
+}
