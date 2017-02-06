@@ -10,7 +10,6 @@ public:
     void parse_request(std::string request);
     std::vector<std::string> split_lines(std::string request);
     
-    std::unordered_map<std::string, std::string> header_map_;
     std::string request_path_;
     std::string raw_request_string_;
 };

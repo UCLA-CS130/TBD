@@ -24,6 +24,7 @@ tcp::socket& Connection::socket() {
 
 // start a connection by listening to web requests
 void Connection::start() {
+    memset(data_, 0, MAX_LENGTH);
     socket_.async_read_some(boost::asio::buffer(data_, MAX_LENGTH),
         boost::bind(&Connection::handle_read, this,
         boost::asio::placeholders::error));
@@ -34,14 +35,11 @@ void Connection::start() {
 bool Connection::handle_read(const boost::system::error_code& error) {
     if (!error) {
         std::string data_string = std::string(data_);
-        std::cout << "before request" << std::endl;
         HttpRequest http_request(data_string);
-        std::cout << "after request" << std::endl;
         HandlerFactory handler_factory(server_config_, &http_request);
         RequestHandler* handler = handler_factory.create_handler();
         std::string response = handler->build_response();
         delete handler;
-        std::cout << "built response!" <<std::endl;
         size_t response_length = response.size();
         boost::asio::async_write(socket_,
             boost::asio::buffer(response, response_length),

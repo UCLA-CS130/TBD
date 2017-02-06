@@ -9,15 +9,12 @@ HandlerFactory::HandlerFactory(ServerConfig* server_config, HttpRequest* http_re
       http_request_(http_request) {}
 
 RequestHandler* HandlerFactory::create_handler() {
-    std::cout << "in create handler!" << std::endl;
     std::unordered_map<std::string, std::string> path_map = server_config_->get_path_map();
     RequestHandler* handler = nullptr;
 
     if (http_request_->request_path_ == path_map["/echo/"]) {
-        std::cout << "in echo!" << std::endl;
         handler = new EchoHandler(http_request_->raw_request_string_);
     } else {
-        std::cout << "in static!" << std::endl;
         std::string file_path = transform_path();
         handler = new StaticFileHandler(file_path);
     }
