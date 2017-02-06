@@ -10,12 +10,12 @@ std::string StaticFileHandler::build_response() {
     std::string file_content = "";
 
     std::string mime_type = get_mime_type();
+    bool cannot_open_file = false;
     if (mime_type != "") {
-        file_content = read_file();
+        file_content = read_file(cannot_open_file);
     }
     
-    // TODO: distinguish empty file from cannot open
-    if (file_content == "") {
+    if (cannot_open_file) {
         response = build_status_line(404);
         mime_type = "text/plain";
         file_content = "404 File Not Found\n";
@@ -44,7 +44,7 @@ std::string StaticFileHandler::get_mime_type() {
         return "";
 }
 
-std::string StaticFileHandler::read_file() {
+std::string StaticFileHandler::read_file(bool &cannot_open_file) {
     boost::filesystem::ifstream fs(file_path_);
     std::string line;
     std::string file_content;
@@ -55,6 +55,7 @@ std::string StaticFileHandler::read_file() {
         fs.close();
         return file_content;
     } else {
+        cannot_open_file = true;
         return "";
     }
 }

@@ -12,7 +12,7 @@ public:
     virtual ~StaticFileHandler();
     virtual std::string build_response();
     virtual std::string get_mime_type();
-    virtual std::string read_file();
+    virtual std::string read_file(bool &cannot_open_file);
 private:
     std::string file_path_;
 };
