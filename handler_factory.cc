@@ -8,22 +8,22 @@ HandlerFactory::HandlerFactory(ServerConfig* server_config, HttpRequest* http_re
     : server_config_(server_config),
       http_request_(http_request) {}
 
-std::unique_ptr<RequestHandler> HandlerFactory::create_handler() {
+RequestHandler* HandlerFactory::create_handler() {
     std::cout << "in create handler!" << std::endl;
     std::unordered_map<std::string, std::string> path_map = server_config_->get_path_map();
-    std::unique_ptr<RequestHandler> handler = nullptr;
+    RequestHandler* handler = nullptr;
 
     std::cout << "req path: " << http_request_->request_path_ << std::endl;
     std::cout << "echo path: " << path_map["/echo/"] << std::endl;
 
     if (http_request_->request_path_ == path_map["/echo/"]) {
         std::cout << "in echo!" << std::endl;
-        handler = std::unique_ptr<RequestHandler>(new EchoHandler(http_request_->raw_request_string_));
+        handler = new EchoHandler(http_request_->raw_request_string_);
     } else {
         std::cout << "in static!" << std::endl;
         std::string file_path = transform_path();
         std::cout << file_path << std::endl;
-        handler = std::unique_ptr<RequestHandler>(new StaticFileHandler(file_path));
+        handler = new StaticFileHandler(file_path);
     }
 
     return handler;
@@ -37,9 +37,11 @@ std::string HandlerFactory::transform_path() {
     std::unordered_map<std::string, std::string> path_map = server_config_->get_path_map();
     std::string request_path = http_request_->request_path_;
 
-    for (auto it = path_map.begin(); it != path_map.end(); ++it) {
+    for (auto it = path_map.begin(); it != path_map.end(); it++) {
         if (is_prefix(it->first, request_path)) {
+            std::cout << it->first.size() << std::endl;
             std::string right = request_path.substr((it->first).size());
+            std::cout << it->second + right << std::endl;
             return it->second + right;
         }
     }

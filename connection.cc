@@ -37,9 +37,10 @@ bool Connection::handle_read(const boost::system::error_code& error) {
 
         HttpRequest http_request(data_string);
         HandlerFactory handler_factory(server_config_, &http_request);
-        std::unique_ptr<RequestHandler> handler = handler_factory.create_handler();
+        RequestHandler* handler = handler_factory.create_handler();
         std::string response = handler->build_response();
 
+        std::cout << "built response!" <<std::endl;
         size_t response_length = response.size();
         boost::asio::async_write(socket_,
             boost::asio::buffer(response, response_length),
@@ -56,6 +57,7 @@ bool Connection::handle_read(const boost::system::error_code& error) {
 bool Connection::close_socket(const boost::system::error_code& error) {
     if (!error) {
         socket_.close();
+        delete this;
         return true;
     } else {
         delete this;

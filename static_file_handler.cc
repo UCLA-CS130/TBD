@@ -32,7 +32,12 @@ std::string StaticFileHandler::get_mime_type() {
         return "text/plain";
     }
 
+    std::cout << file_path_ << std::endl;
+    std::cout << pos << std::endl;
+
     std::string extension = file_path_.substr(pos);
+    std::cout << extension << std::endl;
+
     if (extension == ".html")
         return "text/html";
     else if (extension == ".txt")

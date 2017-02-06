@@ -8,7 +8,7 @@
 class HandlerFactory {
 public:
     HandlerFactory(ServerConfig* server_config, HttpRequest* http_request);
-    std::unique_ptr<RequestHandler> create_handler();
+    RequestHandler* create_handler();
     std::string transform_path();
     bool is_prefix(std::string short_str, std::string long_str);
 private:
