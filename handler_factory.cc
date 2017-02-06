@@ -13,16 +13,12 @@ RequestHandler* HandlerFactory::create_handler() {
     std::unordered_map<std::string, std::string> path_map = server_config_->get_path_map();
     RequestHandler* handler = nullptr;
 
-    std::cout << "req path: " << http_request_->request_path_ << std::endl;
-    std::cout << "echo path: " << path_map["/echo/"] << std::endl;
-
     if (http_request_->request_path_ == path_map["/echo/"]) {
         std::cout << "in echo!" << std::endl;
         handler = new EchoHandler(http_request_->raw_request_string_);
     } else {
         std::cout << "in static!" << std::endl;
         std::string file_path = transform_path();
-        std::cout << file_path << std::endl;
         handler = new StaticFileHandler(file_path);
     }
 
@@ -39,9 +35,7 @@ std::string HandlerFactory::transform_path() {
 
     for (auto it = path_map.begin(); it != path_map.end(); it++) {
         if (is_prefix(it->first, request_path)) {
-            std::cout << it->first.size() << std::endl;
             std::string right = request_path.substr((it->first).size());
-            std::cout << it->second + right << std::endl;
             return it->second + right;
         }
     }

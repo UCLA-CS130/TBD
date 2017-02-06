@@ -34,12 +34,13 @@ void Connection::start() {
 bool Connection::handle_read(const boost::system::error_code& error) {
     if (!error) {
         std::string data_string = std::string(data_);
-
+        std::cout << "before request" << std::endl;
         HttpRequest http_request(data_string);
+        std::cout << "after request" << std::endl;
         HandlerFactory handler_factory(server_config_, &http_request);
         RequestHandler* handler = handler_factory.create_handler();
         std::string response = handler->build_response();
-
+        delete handler;
         std::cout << "built response!" <<std::endl;
         size_t response_length = response.size();
         boost::asio::async_write(socket_,
