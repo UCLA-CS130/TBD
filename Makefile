@@ -109,12 +109,12 @@ http_request_test : http_request.o http_request_test.o gmock_main.a
 static_file_handler_test : static_file_handler.o static_file_handler_test.o http_request.o request_handler.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
-# handler_factory_test : handler_factory.o handler_factory_test.o gmock_main.a
-# 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
+handler_factory_test : handler_factory.o handler_factory_test.o static_file_handler.o echo_handler.o request_handler.o config_parser.o server_config.o gmock_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
 TESTS = config_parser_test server_test connection_test echo_handler_test \
 		request_handler_test server_config_test http_request_test static_file_handler_test \
-		# handler_factory_test
+		handler_factory_test
 test : $(TESTS)
 	for t in $^ ; do ./$$t ; done
 
