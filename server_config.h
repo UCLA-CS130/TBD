@@ -1,9 +1,8 @@
-#ifndef ECHO_HANDLER_H
-#define ECHO_HANDLER_H
+#ifndef SERVER_CONFIG_H
+#define SERVER_CONFIG_H
 
 #include "config_parser.h"
 
-// TODO: add tests for server config
 class ServerConfig {
 public:
     ServerConfig(NginxConfig* config);

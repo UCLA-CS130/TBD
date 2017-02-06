@@ -2,7 +2,8 @@
 #include <iostream>
 #include "http_request.h"
 
-HttpRequest::HttpRequest(std::string request) {
+HttpRequest::HttpRequest(std::string request)
+    : raw_request_string_(request) {
     parse_request(request);
 }
 
@@ -15,11 +16,6 @@ void HttpRequest::parse_request(std::string request) {
             std::string temp = lines[i].substr(first_space + 1);
             size_t second_space = temp.find(" ");
             request_path_ = temp.substr(0, second_space);
-        } else {
-            size_t pos = lines[i].find(": ");
-            std::string header_name = lines[i].substr(0, pos);
-            std::string header_value = lines[i].substr(pos + 2);
-            header_map_[header_name] = header_value;
         }
     }
 }

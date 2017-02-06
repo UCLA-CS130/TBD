@@ -5,10 +5,10 @@
 class ServerTest : public ::testing::Test {
 protected:
     bool handle_accept(boost::system::error_code err) {
-        conn = new Connection(io_service);
         NginxConfig config;
         ServerConfig server_config(&config);
         Server server(io_service, &server_config);
+        conn = new Connection(io_service, &server_config);
         return server.handle_accept(conn, err);
     }
     Connection* conn;

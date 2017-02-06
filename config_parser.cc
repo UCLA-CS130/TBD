@@ -50,7 +50,10 @@ std::unordered_map<std::string, std::string> NginxConfig::extract_path_map() {
     if (statements_[i]->tokens_[0] == "path") {
       std::vector<std::shared_ptr<NginxConfigStatement>> statements = statements_[i]->child_block_->statements_;
       for (size_t j = 0; j < statements.size(); j++) {
-        path_map[statements[j]->tokens_[0]] = statements[j]->tokens_[1];
+        // TODO: do not allow '../'
+        std::string entry_value = statements[j]->tokens_[1];
+        if (entry_value == "./") entry_value = "";
+        path_map[statements[j]->tokens_[0]] = entry_value;
       }
       return path_map;
     }

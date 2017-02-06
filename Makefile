@@ -39,7 +39,7 @@ all: server
 clean:
 	rm -f config_parser server *_test *.o *.a *.gcno *.gcda *.gcov
 
-server: server_main.o server.o config_parser.o connection.o echo_handler.o request_handler.o server_config.o http_request.o
+server: server_main.o server.o config_parser.o connection.o echo_handler.o request_handler.o server_config.o http_request.o static_file_handler.o handler_factory.o
 	$(CXX) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
 config_parser: config_parser.cc config_parser_main.cc
@@ -92,10 +92,12 @@ echo_handler_test : echo_handler_test.o echo_handler.o request_handler.o gmock_m
 server_config_test : server_config_test.o server_config.o config_parser.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
-connection_test : connection_test.o connection.o request_handler.o echo_handler.o http_request.o gmock_main.a
+connection_test : connection_test.o connection.o request_handler.o echo_handler.o config_parser.o http_request.o static_file_handler.o handler_factory.o \
+					server_config.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
-server_test : config_parser.o server.o server_test.o connection.o request_handler.o echo_handler.o server_config.o http_request.o gmock_main.a
+server_test : config_parser.o server.o server_test.o connection.o request_handler.o echo_handler.o server_config.o http_request.o static_file_handler.o \
+				 handler_factory.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
 config_parser_test : config_parser.o config_parser_test.o gtest_main.a
@@ -104,8 +106,16 @@ config_parser_test : config_parser.o config_parser_test.o gtest_main.a
 http_request_test : http_request.o http_request_test.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
+static_file_handler_test : static_file_handler.o static_file_handler_test.o http_request.o request_handler.o gmock_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
+
+handler_factory_test : handler_factory.o handler_factory_test.o static_file_handler.o echo_handler.o request_handler.o config_parser.o http_request.o \
+						 server_config.o gmock_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
+
 TESTS = config_parser_test server_test connection_test echo_handler_test \
-		request_handler_test server_config_test http_request_test
+		request_handler_test server_config_test http_request_test static_file_handler_test \
+		handler_factory_test
 test : $(TESTS)
 	for t in $^ ; do ./$$t ; done
 

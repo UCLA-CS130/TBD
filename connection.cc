@@ -6,11 +6,15 @@
 #include <cstring>
 #include "connection.h"
 #include "echo_handler.h"
+#include "static_file_handler.h"
 #include "http_request.h"
+#include "handler_factory.h"
 
 using boost::asio::ip::tcp;
 
-Connection::Connection(boost::asio::io_service& io_service) : socket_(io_service) {}
+Connection::Connection(boost::asio::io_service& io_service, ServerConfig* server_config)
+    : socket_(io_service),
+      server_config_(server_config) {}
 
 Connection::~Connection() {}
 
@@ -20,6 +24,7 @@ tcp::socket& Connection::socket() {
 
 // start a connection by listening to web requests
 void Connection::start() {
+    memset(data_, 0, MAX_LENGTH);
     socket_.async_read_some(boost::asio::buffer(data_, MAX_LENGTH),
         boost::bind(&Connection::handle_read, this,
         boost::asio::placeholders::error));
@@ -30,11 +35,11 @@ void Connection::start() {
 bool Connection::handle_read(const boost::system::error_code& error) {
     if (!error) {
         std::string data_string = std::string(data_);
-
         HttpRequest http_request(data_string);
-
-        EchoHandler echo_handler(data_string);
-        std::string response = echo_handler.build_response();
+        HandlerFactory handler_factory(server_config_, &http_request);
+        std::unique_ptr<RequestHandler> handler = handler_factory.create_handler();
+        std::string response = handler->build_response();
+        
         size_t response_length = response.size();
         boost::asio::async_write(socket_,
             boost::asio::buffer(response, response_length),
@@ -51,6 +56,7 @@ bool Connection::handle_read(const boost::system::error_code& error) {
 bool Connection::close_socket(const boost::system::error_code& error) {
     if (!error) {
         socket_.close();
+        delete this;
         return true;
     } else {
         delete this;

@@ -16,6 +16,7 @@ private:
     void start_accept();
     boost::asio::io_service& io_service_;
     tcp::acceptor acceptor_;
+    ServerConfig* server_config_;
 };
 
 #endif
