@@ -8,15 +8,15 @@ HandlerFactory::HandlerFactory(ServerConfig* server_config, HttpRequest* http_re
     : server_config_(server_config),
       http_request_(http_request) {}
 
-RequestHandler* HandlerFactory::create_handler() {
+std::unique_ptr<RequestHandler> HandlerFactory::create_handler() {
     std::unordered_map<std::string, std::string> path_map = server_config_->get_path_map();
-    RequestHandler* handler = nullptr;
+    std::unique_ptr<RequestHandler> handler = nullptr;
 
     if (http_request_->request_path_ == path_map["/echo/"]) {
-        handler = new EchoHandler(http_request_->raw_request_string_);
+        handler = std::unique_ptr<RequestHandler>(new EchoHandler(http_request_->raw_request_string_));
     } else {
         std::string file_path = transform_path();
-        handler = new StaticFileHandler(file_path);
+        handler = std::unique_ptr<RequestHandler>(new StaticFileHandler(file_path));
     }
 
     return handler;
