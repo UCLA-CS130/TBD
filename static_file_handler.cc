@@ -11,9 +11,7 @@ std::string StaticFileHandler::build_response() {
 
     std::string mime_type = get_mime_type();
     bool cannot_open_file = false;
-    if (mime_type != "") {
-        file_content = read_file(cannot_open_file);
-    }
+    file_content = read_file(cannot_open_file);
     
     if (cannot_open_file) {
         response = build_status_line(404);
