@@ -1,3 +1,8 @@
+# Sources:
+# https://github.com/google/googlemock/blob/master/googlemock/make/Makefile
+# https://github.com/google/googletest/blob/master/googletest/make/Makefile
+
+
 # Points to the root of Google Test, relative to where this file is.
 # Remember to tweak this if you move this file.
 GTEST_DIR=googletest/googletest
@@ -9,7 +14,7 @@ GMOCK_DIR=googletest/googlemock
 CPPFLAGS += -isystem $(GTEST_DIR)/include -isystem $(GMOCK_DIR)/include
 
 # Flags passed to the C++ compiler.
-CXXFLAGS += -g -Wall -Wextra -pthread -std=c++0x
+CXXFLAGS += -g -Wall -Wextra -Werror -pthread -std=c++0x
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -29,13 +34,13 @@ GTEST_SRCS_ = $(GTEST_DIR)/src/*.cc $(GTEST_DIR)/src/*.h $(GTEST_HEADERS)
 GMOCK_SRCS_ = $(GMOCK_DIR)/src/*.cc $(GMOCK_HEADERS)
 
 
-all: server config_parser
+all: server
 
 clean:
-	rm -f config_parser config_parser_test server server_test connection_test *.o *.a *.gcno *.gcda *.gcov
+	rm -f config_parser server *_test *.o *.a *.gcno *.gcda *.gcov
 
-server: server.cc config_parser.cc
-	g++ -std=c++0x -o server server.cc server_main.cc connection.cc config_parser.cc -lboost_system
+server: server_main.o server.o config_parser.o connection.o echo_handler.o request_handler.o server_config.o http_request.o static_file_handler.o handler_factory.o
+	$(CXX) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
 config_parser: config_parser.cc config_parser_main.cc
 	g++ config_parser.cc config_parser_main.cc -std=c++0x -g -Wall -o config_parser
@@ -72,39 +77,53 @@ gmock.a : gmock-all.o gtest-all.o
 gmock_main.a : gmock-all.o gtest-all.o gmock_main.o
 	$(AR) $(ARFLAGS) $@ $^
 
-connection.o : connection.cc connection.h $(GMOCK_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c connection.cc
+$(basename $(wildcard %.o)) : %.cc
+	$(CXX) $(CXXFLAGS) -c %.cc
 
-connection_test.o : connection_test.cc connection.h $(GMOCK_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c connection_test.cc
+$(basename $(wildcard %_test.o)) : %_test.cc $(GMOCK_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c %_test.cc
 
-connection_test : connection_test.o connection.o gmock_main.a
+request_handler_test : request_handler_test.o request_handler.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
-server.o : server.cc server.h $(GMOCK_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c server.cc
-
-server_test.o : server_test.cc server.h $(GMOCK_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c server_test.cc
-
-server_test : config_parser.o server.o server_test.o connection.o gmock_main.a
+echo_handler_test : echo_handler_test.o echo_handler.o request_handler.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
-config_parser.o : config_parser.cc config_parser.h $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c config_parser.cc
+server_config_test : server_config_test.o server_config.o config_parser.o gmock_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
-config_parser_test.o : config_parser_test.cc config_parser.h $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c config_parser_test.cc
+connection_test : connection_test.o connection.o request_handler.o echo_handler.o config_parser.o http_request.o static_file_handler.o handler_factory.o \
+					server_config.o gmock_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
+
+server_test : config_parser.o server.o server_test.o connection.o request_handler.o echo_handler.o server_config.o http_request.o static_file_handler.o \
+				 handler_factory.o gmock_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
 config_parser_test : config_parser.o config_parser_test.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
-test : config_parser_test server_test connection_test
-	./config_parser_test; ./server_test; ./connection_test
+http_request_test : http_request.o http_request_test.o gmock_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
+
+static_file_handler_test : static_file_handler.o static_file_handler_test.o http_request.o request_handler.o gmock_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
+
+handler_factory_test : handler_factory.o handler_factory_test.o static_file_handler.o echo_handler.o request_handler.o config_parser.o http_request.o \
+						 server_config.o gmock_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
+
+TESTS = config_parser_test server_test connection_test echo_handler_test \
+		request_handler_test server_config_test http_request_test static_file_handler_test \
+		handler_factory_test
+test : $(TESTS)
+	for t in $^ ; do ./$$t ; done
 
 coverage : CXXFLAGS += -fprofile-arcs -ftest-coverage
-coverage : server_test connection_test
-	./server_test && gcov -r server.cc; ./connection_test && gcov -r connection.cc
+coverage : test
+	gcov -r server.cc; gcov -r connection.cc; gcov -r config_parser.cc; \
+	gcov -r echo_handler.cc; gcov -r request_handler.cc; gcov -r server_config.cc; \
+	gcov -r http_request.cc;
 
 integration : 
 	python server_integration_test.py

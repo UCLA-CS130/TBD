@@ -1,0 +1,9 @@
+server {
+  listen   8080;
+  root /home/ubuntu/sites/foo/;
+  path {
+    /static1/ ./;
+    /static2/ hw4/;
+    /echo/ /foo;
+  }
+}

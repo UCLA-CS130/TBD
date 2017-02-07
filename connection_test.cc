@@ -5,14 +5,17 @@
 class ConnectionTest : public ::testing::Test {
 protected:
     bool handle_read(boost::system::error_code err) {
-        conn = new Connection(io_service);
-        return conn->handle_read(err, bytes_transferred);
+        ServerConfig server_config(&config);
+        conn = new Connection(io_service, &server_config);
+        return conn->handle_read(err);
     }
     bool close_socket(boost::system::error_code err) {
-        conn = new Connection(io_service);
+        ServerConfig server_config(&config);
+        conn = new Connection(io_service, &server_config);
         return conn->close_socket(err);
     }
-    size_t bytes_transferred = 24;
+
+    NginxConfig config;
     Connection* conn;
     boost::asio::io_service io_service;
 };
