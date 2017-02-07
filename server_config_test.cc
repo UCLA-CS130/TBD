@@ -20,7 +20,7 @@ TEST_F(ServerConfigTest, GetPortTest) {
 }
 
 TEST_F(ServerConfigTest, MissingPortTest) {
-    parseConfig("", &out_config);
+    parseConfig("root /hello/;", &out_config);
 
     ServerConfig server_config(&out_config);
     EXPECT_EQ(8080, server_config.get_port());
@@ -36,7 +36,7 @@ TEST_F(ServerConfigTest, GetPathMapTest) {
 }
 
 TEST_F(ServerConfigTest, MissingPathMapTest) {
-    parseConfig("", &out_config);
+    parseConfig("listen 8080;", &out_config);
 
     ServerConfig server_config(&out_config);
     EXPECT_EQ(1, server_config.get_path_map().size());

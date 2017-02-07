@@ -8,14 +8,14 @@ class HandlerFactoryTest : public ::testing::Test {
             return handler_factory.is_prefix(short_str, long_str);
         }
         std::string transform_path(std::string request) {
-            parseConfig("path { /static1/ test/my/;\n }", &out_config);
+            parseConfig("listen 8080; path { /static1/ test/my/;\n }", &out_config);
             ServerConfig server_config(&out_config);
             HttpRequest http_request(request);
             HandlerFactory handler_factory(&server_config, &http_request);
             return handler_factory.transform_path();
         }
         std::string create_handler(std::string request) {
-            parseConfig("root ./;\npath { /static1/ ./;\n /echo/ / }", &out_config);
+            parseConfig("listen 8080;\npath { /static1/ ./;\n /echo/ /; }", &out_config);
             ServerConfig server_config(&out_config);
             HttpRequest http_request(request);
             HandlerFactory handler_factory(&server_config, &http_request);

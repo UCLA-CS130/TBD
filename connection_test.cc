@@ -5,17 +5,18 @@
 class ConnectionTest : public ::testing::Test {
 protected:
     bool handle_read(boost::system::error_code err) {
-        NginxConfig config;
         ServerConfig server_config(&config);
-        Connection conn(io_service, &server_config);
-        return conn.handle_read(err);
+        conn = new Connection(io_service, &server_config);
+        return conn->handle_read(err);
     }
     bool close_socket(boost::system::error_code err) {
-        NginxConfig config;
         ServerConfig server_config(&config);
-        Connection conn(io_service, &server_config);
-        return conn.close_socket(err);
+        conn = new Connection(io_service, &server_config);
+        return conn->close_socket(err);
     }
+
+    NginxConfig config;
+    Connection* conn;
     boost::asio::io_service io_service;
 };
 
