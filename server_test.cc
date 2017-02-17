@@ -4,23 +4,20 @@
 
 class ServerTest : public ::testing::Test {
 protected:
-    bool handle_accept(boost::system::error_code err) {
+    std::string handle_read(const char* data) {
+        NginxConfigParser parser;
         NginxConfig config;
+        parser.Parse("path_config", &config);
+
+        boost::asio::io_service io_service;
         ServerConfig server_config(&config);
         Server server(io_service, &server_config);
-        conn = new Connection(io_service, &server_config);
-        return server.handle_accept(conn, err);
+        return server.handle_read(data);
     }
-    Connection* conn;
-    boost::asio::io_service io_service;
 };
 
-TEST_F(ServerTest, HandleAcceptSuccess) {
-    boost::system::error_code err = boost::system::errc::make_error_code(boost::system::errc::success);
-    EXPECT_TRUE(handle_accept(err));
-}
-
-TEST_F(ServerTest, HandleAcceptFail) {
-    boost::system::error_code err = boost::system::errc::make_error_code(boost::system::errc::bad_file_descriptor);
-    EXPECT_FALSE(handle_accept(err));
+TEST_F(ServerTest, HandleReadSimpleSuccess) {
+    std::string expected_response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nGET /foo HTTP/1.1\r\nHost: localhost:8080\r\n\r\n";
+    std::string actual_response = handle_read("GET /foo HTTP/1.1\r\nHost: localhost:8080\r\n\r\n");
+    EXPECT_EQ(expected_response, actual_response);
 }

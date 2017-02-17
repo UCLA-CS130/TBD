@@ -1,6 +1,7 @@
 #ifndef REQUEST_HANDLER_H
 #define REQUEST_HANDLER_H
-#include "connection.h"
+
+#include <string>
 
 class RequestHandler {
 public:
