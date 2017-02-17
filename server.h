@@ -4,18 +4,18 @@
 #include <string>
 #include <boost/asio.hpp>
 #include "config_parser.h"
-#include "connection.h"
 #include "server_config.h"
 
 class Server {
 public:
 	Server(boost::asio::io_service& io_service, ServerConfig* server_config);
     virtual ~Server();
-    bool handle_accept(Connection* new_connection, const boost::system::error_code& error);
+    void run();
+    std::string handle_read(const char* data);
 private:
-    void start_accept();
+    static const int MAX_LENGTH = 2048;
     boost::asio::io_service& io_service_;
-    tcp::acceptor acceptor_;
+    boost::asio::ip::tcp::acceptor acceptor_;
     ServerConfig* server_config_;
 };
 

@@ -2,7 +2,6 @@
 #define ECHO_HANDLER_H
 
 #include "request_handler.h"
-#include "connection.h"
 
 class EchoHandler : public RequestHandler {
 public:
