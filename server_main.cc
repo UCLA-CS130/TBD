@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
         // start server and wait for requests
         boost::asio::io_service io_service;
         ServerConfig server_config(&config);
-        Server server(io_service, &server_config);
+        Server server(io_service, &server_config, &config);
         server.run();
     } catch (std::exception& e) {
         std::cerr << e.what() << std::endl;

@@ -14,10 +14,11 @@
 
 using boost::asio::ip::tcp;
 
-Server::Server(boost::asio::io_service& io_service, ServerConfig* server_config) 
+Server::Server(boost::asio::io_service& io_service, NginxConfig* config)
     : io_service_(io_service),
-      acceptor_(io_service, tcp::endpoint(tcp::v4(), server_config->get_port())),
-      server_config_(server_config) {
+      acceptor_(io_service, tcp::endpoint(tcp::v4(), std::stoi(config->getConfigValue("port")))),
+      config_(config) {
+    handler_map_ = create_handler_map(config);
 }
 
 Server::~Server() {}
@@ -51,4 +52,29 @@ std::string Server::handle_read(const char* data) {
     std::string response = handler->build_response();
 
     return response;
+}
+
+std::unordered_map<std::string, std::unique_ptr<RequestHandler> > Server::create_handler_map(NginxConfig* config) {
+    std::unordered_map<std::string, std::unique_ptr<RequestHandler> > handler_map;
+    std::vector<std::shared_ptr<NginxConfigStatement>> statements = config->statements_;
+    
+    for (size_t i = 0; i < statements.size(); i++) {
+        if (statements[i]->tokens_[0] == "path") {
+            std::unique_ptr<RequestHandler> handler = nullptr;
+    
+            if (statements[i]->tokens_[2] == "EchoHandler") {
+                handler = std::unique_ptr<RequestHandler>(new EchoHandler());
+            } else if (statements[i]->tokens_[2] == "StaticHandler") {
+                handler = std::unique_ptr<RequestHandler>(new StaticFileHandler());
+            } else {
+                continue;
+            }
+
+            std::string uri_prefix = statements[i]->tokens_[1];
+            handler->Init(uri_prefix, statements[i]->child_block_);
+            handler_map[uri_prefix] = handler;
+        }
+    }
+
+    return handler_map;
 }
