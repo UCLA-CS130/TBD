@@ -11,6 +11,6 @@ public:
     virtual Status HandleRequest(const Request& request, Response* response);
 };
 
-REGISTER_REQUEST_HANDLER(EchoHandler);
+//REGISTER_REQUEST_HANDLER(EchoHandler);
 
 #endif

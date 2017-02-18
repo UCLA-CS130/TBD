@@ -1,6 +1,12 @@
 #ifndef REQUEST_HANDLER_H
 #define REQUEST_HANDLER_H
 
+// Represents the parent of all request handlers. Implementations should expect to
+// be long lived and created at server constrution.
+
+#include "request.h"
+#include "response.h"
+#include "config_parser.h"
 #include <string>
 #include <vector>
 #include <memory>
@@ -72,12 +78,45 @@ private:
 // Represents the parent of all request handlers. Implementations should expect to
 // be long lived and created at server constrution.
 class RequestHandler {
-public:
-    RequestHandler();
-    virtual ~RequestHandler();
-    virtual std::string build_response();
-    static std::string build_status_line(int status_code);
-    static std::string build_header(std::string field, std::string value);
+ public:
+  RequestHandler();
+  virtual ~RequestHandler();
+
+  enum Status {
+    OK = 0;
+  };
+  
+  // Initializes the handler. Returns a response code indicating success or
+  // failure condition.
+  // uri_prefix is the value in the config file that this handler will run for.
+  // config is the contents of the child block for this handler ONLY.
+  virtual Status Init(const std::string& uri_prefix, const NginxConfig& config) = 0;
+
+  // Handles an HTTP request, and generates a response. Returns a response code
+  // indicating success or failure condition. If ResponseCode is not OK, the
+  // contents of the response object are undefined, and the server will return
+  // HTTP code 500.
+  virtual Status HandleRequest(const Request& request, Response* response) = 0;
+
+  static RequestHandler* CreateByName(const std::string type);
 };
+
+/*extern std::map<std::string, RequestHandler* (*)(void)>* request_handler_builders;
+template<typename T>
+class RequestHandlerRegisterer {
+ public:
+  RequestHandlerRegisterer(const std::string& type) {
+    if (request_handler_builders == nullptr) {
+      request_handler_builders = new std::map<std::string, RequestHandler* (*)(void)>;
+    }
+    (*request_handler_builders)[type] = RequestHandlerRegisterer::Create;
+  }
+  static RequestHandler* Create() {
+    return new T;
+  }
+};
+
+#define REGISTER_REQUEST_HANDLER(ClassName) \
+  static RequestHandlerRegisterer<ClassName> ClassName##__registerer(#ClassName)*/
 
 #endif
