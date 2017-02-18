@@ -1,14 +1,14 @@
 #include "echo_handler.h"
 
-EchoHandler::EchoHandler(std::string request) {
-    request_ = request;
-}
+EchoHandler::EchoHandler() {}
 
 EchoHandler::~EchoHandler() {}
 
-std::string EchoHandler::build_response() {
-    std::string response = build_status_line(200);
-    response += build_header("Content-Type", "text/plain");
-    response += "\r\n" + request_;
-    return response;
+Status EchoHandler::Init(const std::string& uri_prefix, const NginxConfig& config) {}
+
+Status EchoHandler::HandleRequest(const Request& request, Response* response) {
+    response.SetStatus(ResponseCode::OK);
+    response.AddHeader("Content-Type", "text/plain");
+    response.SetBody(request.raw_request());
+    return Status::OK;
 }

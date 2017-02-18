@@ -5,11 +5,12 @@
 
 class EchoHandler : public RequestHandler {
 public:
-    EchoHandler(std::string request);
+    EchoHandler();
     virtual ~EchoHandler();
-    virtual std::string build_response();
-private:
-    std::string request_;
+    virtual Status Init(const std::string& uri_prefix, const NginxConfig& config);
+    virtual Status HandleRequest(const Request& request, Response* response);
 };
+
+REGISTER_REQUEST_HANDLER(EchoHandler);
 
 #endif
