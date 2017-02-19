@@ -22,9 +22,9 @@ std::unique_ptr<Request> Request::Parse(const std::string & raw_request) {
         } else {
         // parse header fields of the request
             auto first_space = lines[i].find(" ");
-            std::string header = lines[i].substr(0, first_space - 1);
-            std::string field = lines[i].substr(first_space + 1);
-            headers.push_back(std::make_pair(header, field));
+            std::string field = lines[i].substr(0, first_space - 1);
+            std::string value = lines[i].substr(first_space + 1);
+            headers.push_back(std::make_pair(field, value));
         }
     }
     new_request.headers_ = headers;
@@ -74,9 +74,10 @@ const std::string body() {
 
 // Response Implementations
 
-std::string Response::to_string() {
+std::string Response::ToString() {
     std::string response = build_status_line(status_code_);
-    response += build_header("Content-Type", mime_type_);
+    for (auto const& header: headers_)
+        response += header;
     response += "\r\n" + response_body_;
     return response;
 }
@@ -84,29 +85,29 @@ std::string Response::to_string() {
 std::string Response::build_status_line() {
     std::string status_line = "HTTP/1.1";
 
-    if (status_code_ == 200) {
+    if (status_code_ == ResponseCode::OK) {
         status_line += " 200 OK";
-    } else if (status_code_ == 404) {
+    } else if (status_code_ == ResponseCode::FILE_NOT_FOUND) {
         status_line += " 404 Not Found";
     }
 
     return status_line + "\r\n";
 }
 
-std::string Response::build_header(std::string field, std::string value) {
+std::string Response::build_header(const std::string field&, const std::string& value) {
     return field + ": " + value + "\r\n";
 }
 
-void Response::set_response_body(const std::string& response_body) {
-    response_body_ = response_body;
+void Response::SetBody(const std::string& body) {
+    response_body_ = body;
 }
 
-void Response::set_status_code(ResponseCode status_code) {
-    status_code_ = status_code;
+void Response::SetStatus(ResponseCode response_code) {
+    status_code_ = response_code;
 }
 
-void Response::set_mime_type(const std::string& mime_type) {
-    mime_type_ = mime_type;
+void Response::AddHeader(const std::string& header_name, const std::string& header_value) {
+    headers.push_back(build_header(header_name, header_value));
 }
 
 

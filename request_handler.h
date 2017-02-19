@@ -48,23 +48,23 @@ private:
 class Response {
 public:
     enum ResponseCode {
-        RESPONSE_200 = 200;
-        RESPONSE_404 = 404;
+        OK = 200;
+        FILE_NOT_FOUND = 404;
     };
 
-    std::string to_string();
-    void set_response_body(const std::string& response_body);
-    void set_status_code(ResponseCode status_code);
+    void SetStatus(const ResponseCode response_code);
+    void AddHeader(const std::string& header_name, const std::string& header_value);
+    void SetBody(const std::string& body);
 
-    void set_mime_type(const std::string& mime_type);
+    std::string ToString();
 
 private:
     std::string build_status_line();
-    std::string build_header(std::string field, std::string value);
+    std::string build_header(const std::string& field, const std::string& value);
     
     std::string response_body_;
-    std::string mime_type_ = "text/plain";
-    int status_code_ = 404; // default to error
+    std::vector<std::string> headers_;
+    ResponseCode status_code_;
 };
 
 // Represents the parent of all request handlers. Implementations should expect to
