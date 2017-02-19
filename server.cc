@@ -46,12 +46,12 @@ void Server::run() {
 
 std::string Server::handle_read(const char* data) {
     std::string data_string = std::string(data);
-    HttpRequest http_request(data_string);
-    HandlerFactory handler_factory(server_config_, &http_request);
-    std::unique_ptr<RequestHandler> handler = handler_factory.create_handler();
-    std::string response = handler->build_response();
+    auto request = Request::Parse(data_string);
+    Response response;
+    std::unique_ptr<RequestHandler> handler = find_handler(request.uri());
+    Status status = handler->HandleRequest(request, &response);
 
-    return response;
+    return response.ToString();
 }
 
 std::unordered_map<std::string, std::unique_ptr<RequestHandler> > Server::create_handler_map(NginxConfig* config) {
@@ -77,4 +77,27 @@ std::unordered_map<std::string, std::unique_ptr<RequestHandler> > Server::create
     }
 
     return handler_map;
+}
+
+// Finds the correct handler using longest uri prefix matching
+std::unique_ptr<RequestHandler> Server::find_handler(std::string uri) {
+    std::string longest_prefix_match = "";
+    for (auto it = handler_map_.begin(); it != handler_map_.end(); it++) {
+        if (is_prefix(it->first, uri) &&
+            (it->first).size() > longest_prefix_match.size()) {
+            longest_prefix_match = it->first;
+        }
+    }
+    return handler_map_[longest_prefix_match];
+}
+
+// Returns true if short_str is a prefix of long_str
+bool HandlerFactory::is_prefix(std::string short_str, std::string long_str) {
+    if (short_str.size() > long_str.size()) return false;
+
+    if (long_str.substr(0, short_str.size()) == short_str) {
+        return true;
+    } else {
+        return false;
+    }
 }

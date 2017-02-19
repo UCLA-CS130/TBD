@@ -15,6 +15,8 @@ public:
     void run();
     std::string handle_read(const char* data);
     std::unordered_map<std::string, std::unique_ptr<RequestHandler> > create_handler_map(NginxConfig* config);
+    std::unique_ptr<RequestHandler> find_handler(std::string uri);
+    bool is_prefix(std::string short_str, std::string long_str)
 private:
     static const int MAX_LENGTH = 2048;
     boost::asio::io_service& io_service_;
