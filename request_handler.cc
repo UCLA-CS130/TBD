@@ -77,7 +77,7 @@ const std::string body() {
 std::string Response::ToString() {
     std::string response = build_status_line(status_code_);
     for (auto const& header: headers_)
-        response += header;
+        response += build_header_string(header);
     response += "\r\n" + response_body_;
     return response;
 }
@@ -94,8 +94,8 @@ std::string Response::build_status_line() {
     return status_line + "\r\n";
 }
 
-std::string Response::build_header(const std::string field&, const std::string& value) {
-    return field + ": " + value + "\r\n";
+std::string Response::build_header_string(const std::pair<std::string, std::string> field) {
+    return field.first + ": " + field.second + "\r\n";
 }
 
 void Response::SetBody(const std::string& body) {
@@ -107,7 +107,7 @@ void Response::SetStatus(ResponseCode response_code) {
 }
 
 void Response::AddHeader(const std::string& header_name, const std::string& header_value) {
-    headers.push_back(build_header(header_name, header_value));
+    headers_.push_back(std::make_pair(header_name, header_value));
 }
 
 

@@ -60,11 +60,13 @@ public:
 
 private:
     std::string build_status_line();
-    std::string build_header(const std::string& field, const std::string& value);
+    std::string build_header_string(const std::pair<std::string, std::string>& field);
     
     std::string response_body_;
-    std::vector<std::string> headers_;
     ResponseCode status_code_;
+    
+    using Headers = std::vector<std::pair<std::string, std::string>>;
+    Headers headers_;
 };
 
 // Represents the parent of all request handlers. Implementations should expect to
