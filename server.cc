@@ -50,6 +50,7 @@ std::string Server::handle_read(const char* data) {
     std::string longest_prefix = find_uri_prefix(request->uri());
     RequestHandler::Status status = handler_map_[longest_prefix]->HandleRequest(*request, &response);
 
+    // TODO: check status
     if (status == RequestHandler::OK) {
         std::cout << "handle request OK!" << std::endl;
     }
@@ -71,28 +72,32 @@ void Server::create_handler_map(NginxConfig* config) {
                 continue;
             }
 
+            // TODO: Check status
             handler_map_[uri_prefix]->Init(uri_prefix, *(statements[i]->child_block_));
         }
     }
 }
 
 // Finds the correct handler using longest uri prefix matching
-std::string Server::find_uri_prefix(std::string uri) {
+std::string Server::find_uri_prefix(std::string request_uri) {
     std::string longest_prefix_match = "";
     for (auto it = handler_map_.begin(); it != handler_map_.end(); it++) {
-        if (is_prefix(it->first, uri) &&
-            (it->first).size() > longest_prefix_match.size()) {
-            longest_prefix_match = it->first;
+        std::string prefix = it->first;
+        if (is_uri_prefix(prefix, request_uri) &&
+            prefix.size() > longest_prefix_match.size()) {
+            longest_prefix_match = prefix;
         }
     }
     return longest_prefix_match;
 }
 
-// Returns true if short_str is a prefix of long_str
-bool Server::is_prefix(std::string short_str, std::string long_str) {
+// Returns true if short_str is a uri prefix of long_str
+// e.g. /foo is a uri prefix of /foo/boo, but not of /fooo
+bool Server::is_uri_prefix(std::string short_str, std::string long_str) {
     if (short_str.size() > long_str.size()) return false;
 
-    if (long_str.substr(0, short_str.size()) == short_str) {
+    if ((long_str.substr(0, short_str.size()) == short_str) &&
+        (short_str == long_str || long_str[short_str.size()] == '/')) {
         return true;
     } else {
         return false;

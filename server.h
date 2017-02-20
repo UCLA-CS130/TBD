@@ -15,7 +15,7 @@ public:
     std::string handle_read(const char* data);
     void create_handler_map(NginxConfig* config);
     std::string find_uri_prefix(std::string uri);
-    bool is_prefix(std::string short_str, std::string long_str);
+    bool is_uri_prefix(std::string short_str, std::string long_str);
 private:
     static const int MAX_LENGTH = 2048;
     boost::asio::io_service& io_service_;
