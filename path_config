@@ -11,3 +11,7 @@ path /static1 StaticHandler {
 path /static2 StaticHandler {
     root hw4/;
 }
+
+default NotFoundHandler {
+    root./;
+}

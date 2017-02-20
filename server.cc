@@ -10,6 +10,7 @@
 #include "server.h"
 #include "echo_handler.h"
 #include "static_file_handler.h"
+#include "not_found_handler.h"
 
 using boost::asio::ip::tcp;
 
@@ -53,6 +54,9 @@ std::string Server::handle_read(const char* data) {
     // TODO: check status
     if (status == RequestHandler::OK) {
         std::cout << "handle request OK!" << std::endl;
+    } else if (status == RequestHandler::FILE_NOT_FOUND) {
+        std::cout << "FILE_NOT_FOUND" << std::endl;
+        handler_map_["default"]->HandleRequest(*request, &response);
     }
     return response.ToString();
 }
@@ -74,6 +78,8 @@ void Server::create_handler_map(NginxConfig* config) {
 
             // TODO: Check status
             handler_map_[uri_prefix]->Init(uri_prefix, *(statements[i]->child_block_));
+        } else if (statements[i]->tokens_[0] == "default") {
+            handler_map_["default"] = std::unique_ptr<NotFoundHandler>(new NotFoundHandler());
         }
     }
 }
@@ -88,6 +94,10 @@ std::string Server::find_uri_prefix(std::string request_uri) {
             longest_prefix_match = prefix;
         }
     }
+
+    if (longest_prefix_match == "")
+        longest_prefix_match = "default";
+
     return longest_prefix_match;
 }
 

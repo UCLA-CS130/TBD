@@ -1,4 +1,5 @@
 #include "static_file_handler.h"
+#include "not_found_handler.h"
 
 StaticFileHandler::StaticFileHandler() {}
 
@@ -52,9 +53,9 @@ StaticFileHandler::Status StaticFileHandler::HandleRequest(const Request& reques
 
         std::string content_type = GetMimeType(file_path);
         response->AddHeader("Content-Type", content_type);
-
         response->SetBody(file_content);
         return OK;
-    } else
+    } else {
         return FILE_NOT_FOUND;
+    }
 }
