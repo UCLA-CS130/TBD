@@ -98,21 +98,21 @@ class RequestHandler {
   // HTTP code 500.
   virtual Status HandleRequest(const Request& request, Response* response) = 0;
 
-  static RequestHandler* CreateByName(const std::string type);
+  static std::unique_ptr<RequestHandler> CreateByName(const std::string type);
 };
 
-extern std::map<std::string, RequestHandler* (*)(void)>* request_handler_builders;
+extern std::map<std::string, std::unique_ptr<RequestHandler> (*)(void)>* request_handler_builders;
 template<typename T>
 class RequestHandlerRegisterer {
  public:
   RequestHandlerRegisterer(const std::string& type) {
     if (request_handler_builders == nullptr) {
-      request_handler_builders = new std::map<std::string, RequestHandler* (*)(void)>;
+      request_handler_builders = new std::map<std::string, std::unique_ptr<RequestHandler> (*)(void)>;
     }
     (*request_handler_builders)[type] = RequestHandlerRegisterer::Create;
   }
-  static RequestHandler* Create() {
-    return new T;
+  static std::unique_ptr<RequestHandler> Create() {
+    return std::unique_ptr<RequestHandler>(new T);
   }
 };
 
