@@ -17,7 +17,7 @@ Server::Server(boost::asio::io_service& io_service, NginxConfig* config)
     : io_service_(io_service),
       acceptor_(io_service, tcp::endpoint(tcp::v4(), std::stoi(config->getConfigValue("port")))),
       config_(config) {
-    create_handler_map(config);
+    create_handler_map(config_);
 }
 
 Server::~Server() {}
