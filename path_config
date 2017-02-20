@@ -1,11 +1,13 @@
 port   8080;
 
-path /foo EchoHandler {}
-
-path /static1 StaticFileHandler {
-    root ./
+path /foo EchoHandler {
+    root ./;
 }
 
-path /static2 StaticFileHandler {
-    root hw4/
+path /static1 StaticHandler {
+    root ./;
+}
+
+path /static2 StaticHandler {
+    root hw4/;
 }

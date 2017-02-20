@@ -47,8 +47,8 @@ std::string Server::handle_read(const char* data) {
     std::string data_string = std::string(data);
     auto request = Request::Parse(data_string);
     Response response;
-    std::unique_ptr<RequestHandler> handler = find_handler(request->uri());
-    RequestHandler::Status status = handler->HandleRequest(*request, &response);
+    std::string longest_prefix = find_uri_prefix(request->uri());
+    RequestHandler::Status status = handler_map_[longest_prefix]->HandleRequest(*request, &response);
 
     if (status == RequestHandler::OK) {
         std::cout << "handle request OK!" << std::endl;
@@ -77,7 +77,7 @@ void Server::create_handler_map(NginxConfig* config) {
 }
 
 // Finds the correct handler using longest uri prefix matching
-std::unique_ptr<RequestHandler> Server::find_handler(std::string uri) {
+std::string Server::find_uri_prefix(std::string uri) {
     std::string longest_prefix_match = "";
     for (auto it = handler_map_.begin(); it != handler_map_.end(); it++) {
         if (is_prefix(it->first, uri) &&
@@ -85,7 +85,7 @@ std::unique_ptr<RequestHandler> Server::find_handler(std::string uri) {
             longest_prefix_match = it->first;
         }
     }
-    return std::move(handler_map_[longest_prefix_match]);
+    return longest_prefix_match;
 }
 
 // Returns true if short_str is a prefix of long_str

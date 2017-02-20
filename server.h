@@ -14,7 +14,7 @@ public:
     void run();
     std::string handle_read(const char* data);
     void create_handler_map(NginxConfig* config);
-    std::unique_ptr<RequestHandler> find_handler(std::string uri);
+    std::string find_uri_prefix(std::string uri);
     bool is_prefix(std::string short_str, std::string long_str);
 private:
     static const int MAX_LENGTH = 2048;
