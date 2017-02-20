@@ -4,8 +4,8 @@
 // Represents the parent of all request handlers. Implementations should expect to
 // be long lived and created at server constrution.
 
-#include "request.h"
-#include "response.h"
+// #include "request.h"
+// #include "response.h"
 #include "config_parser.h"
 #include <string>
 #include <vector>
@@ -18,20 +18,18 @@
 // auto request = Request::Parse(raw_request);
 class Request {
 public:
-    static unique_ptr<Request> Parse(const std::string& raw_request);
+    static std::unique_ptr<Request> Parse(const std::string& raw_request);
 
     std::string raw_request() const;
     std::string method() const;
     std::string uri() const;
     std::string version() const;
+    std::string body() const;
 
     using Headers = std::vector<std::pair<std::string, std::string>>;
     Headers headers() const;
-
-    std::string body() const;
-
 private:
-    std::vector<std::string> split_lines(std::string request);
+    static std::vector<std::string> split_lines(std::string request);
 
     std::string raw_request_;
     std::string method_;
@@ -54,8 +52,8 @@ private:
 class Response {
 public:
     enum ResponseCode {
-        OK = 200;
-        FILE_NOT_FOUND = 404;
+        OK = 200,
+        FILE_NOT_FOUND = 404
     };
 
     void SetStatus(const ResponseCode response_code);
@@ -83,7 +81,8 @@ class RequestHandler {
   virtual ~RequestHandler();
 
   enum Status {
-    OK = 0;
+    OK = 0,
+    FILE_NOT_FOUND = 404
   };
   
   // Initializes the handler. Returns a response code indicating success or

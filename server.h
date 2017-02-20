@@ -5,7 +5,6 @@
 #include <boost/asio.hpp>
 #include <unordered_map>
 #include "config_parser.h"
-#include "server_config.h"
 #include "request_handler.h"
 
 class Server {
@@ -14,9 +13,9 @@ public:
     virtual ~Server();
     void run();
     std::string handle_read(const char* data);
-    std::unordered_map<std::string, std::unique_ptr<RequestHandler> > create_handler_map(NginxConfig* config);
+    void create_handler_map(NginxConfig* config);
     std::unique_ptr<RequestHandler> find_handler(std::string uri);
-    bool is_prefix(std::string short_str, std::string long_str)
+    bool is_prefix(std::string short_str, std::string long_str);
 private:
     static const int MAX_LENGTH = 2048;
     boost::asio::io_service& io_service_;

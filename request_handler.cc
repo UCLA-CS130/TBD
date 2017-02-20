@@ -6,28 +6,26 @@
 
 std::unique_ptr<Request> Request::Parse(const std::string & raw_request) {
     std::unique_ptr<Request> new_request(new Request());
-    new_request.raw_request_ = raw_request;
+    new_request->raw_request_ = raw_request;
     
-    Headers headers = new Headers();
     std::vector<std::string> lines = split_lines(raw_request);
-    for (auto i = 0; i < lines.size() - 1; i++) {
+    for (size_t i = 0; i < lines.size() - 1; i++) {
         if (i == 0) {
         // parse first line of the request
             auto first_space = lines[i].find(" ");
-            new_request.method_ = lines[i].substr(0, first_space);
+            new_request->method_ = lines[i].substr(0, first_space);
             std::string temp = lines[i].substr(first_space + 1);
             auto second_space = temp.find(" ");
-            new_request.uri_ = temp.substr(0, second_space);
-            new_request.version_ = temp.substr(second_space + 1);
+            new_request->uri_ = temp.substr(0, second_space);
+            new_request->version_ = temp.substr(second_space + 1);
         } else {
         // parse header fields of the request
             auto first_space = lines[i].find(" ");
             std::string field = lines[i].substr(0, first_space - 1);
             std::string value = lines[i].substr(first_space + 1);
-            headers.push_back(std::make_pair(field, value));
+            new_request->headers_.push_back(std::make_pair(field, value));
         }
     }
-    new_request.headers_ = headers;
     
     return new_request;
 }
@@ -47,35 +45,36 @@ std::vector<std::string> Request::split_lines(std::string request) {
     return lines;
 }
 
-const std::string Request::raw_request() {
+std::string Request::raw_request() const {
     return raw_request_;
 }
 
-const std::string Request::method() {
+std::string Request::method() const {
     return method_;
 }
 
-const std::string Request::uri() {
+std::string Request::uri() const {
     return uri_;
 }
 
-const std::string Request::version() {
+std::string Request::version() const {
     return version_;
 }
 
-const Headers Request::headers() {
-    return headers_;
+std::string Request::body() const {
+    return body_;
 }
 
-const std::string body() {
-    return body_;
+using Headers = std::vector<std::pair<std::string, std::string>>;
+Headers Request::headers() const {
+    return headers_;
 }
 
 
 // Response Implementations
 
 std::string Response::ToString() {
-    std::string response = build_status_line(status_code_);
+    std::string response = build_status_line();
     for (auto const& header: headers_)
         response += build_header_string(header);
     response += "\r\n" + response_body_;
@@ -94,7 +93,7 @@ std::string Response::build_status_line() {
     return status_line + "\r\n";
 }
 
-std::string Response::build_header_string(const std::pair<std::string, std::string> field) {
+std::string Response::build_header_string(const std::pair<std::string, std::string>& field) {
     return field.first + ": " + field.second + "\r\n";
 }
 
