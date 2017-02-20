@@ -63,23 +63,15 @@ std::string Server::handle_read(const char* data) {
 
 void Server::create_handler_map(NginxConfig* config) {
     std::vector<std::shared_ptr<NginxConfigStatement>> statements = config->statements_;
-    
     for (size_t i = 0; i < statements.size(); i++) {
         if (statements[i]->tokens_[0] == "path") {
             std::string uri_prefix = statements[i]->tokens_[1];
-
-            if (statements[i]->tokens_[2] == "EchoHandler") {
-                handler_map_[uri_prefix] = std::unique_ptr<RequestHandler>(new EchoHandler());
-            } else if (statements[i]->tokens_[2] == "StaticHandler") {
-                handler_map_[uri_prefix] = std::unique_ptr<RequestHandler>(new StaticFileHandler());
-            } else {
-                continue;
-            }
+            handler_map_[uri_prefix] = RequestHandler::CreateByName(statements[i]->tokens_[2]);
 
             // TODO: Check status
             handler_map_[uri_prefix]->Init(uri_prefix, *(statements[i]->child_block_));
         } else if (statements[i]->tokens_[0] == "default") {
-            handler_map_["default"] = std::unique_ptr<NotFoundHandler>(new NotFoundHandler());
+            handler_map_["default"] = RequestHandler::CreateByName("NotFoundHandler");
         }
     }
 }

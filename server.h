@@ -21,7 +21,7 @@ private:
     boost::asio::io_service& io_service_;
     boost::asio::ip::tcp::acceptor acceptor_;
     NginxConfig* config_;
-    std::unordered_map<std::string, std::unique_ptr<RequestHandler> > handler_map_;
+    std::unordered_map<std::string, RequestHandler*> handler_map_;
 };
 
 #endif

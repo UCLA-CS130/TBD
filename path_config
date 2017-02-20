@@ -4,14 +4,14 @@ path /foo EchoHandler {
     root ./;
 }
 
-path /static1 StaticHandler {
+path /static1 StaticFileHandler {
     root ./;
 }
 
-path /static2 StaticHandler {
+path /static2 StaticFileHandler {
     root hw4/;
 }
 
 default NotFoundHandler {
-    root./;
+    root ./;
 }

@@ -18,6 +18,6 @@ private:
     std::string root_path_;
 };
 
-//REGISTER_REQUEST_HANDLER(StaticFileHandler);
+REGISTER_REQUEST_HANDLER(StaticFileHandler);
 
 #endif

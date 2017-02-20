@@ -11,6 +11,7 @@
 #include <vector>
 #include <memory>
 #include <utility>
+#include <map>
 
 // Represents an HTTP Request.
 // 
@@ -100,7 +101,7 @@ class RequestHandler {
   static RequestHandler* CreateByName(const std::string type);
 };
 
-/*extern std::map<std::string, RequestHandler* (*)(void)>* request_handler_builders;
+extern std::map<std::string, RequestHandler* (*)(void)>* request_handler_builders;
 template<typename T>
 class RequestHandlerRegisterer {
  public:
@@ -116,6 +117,6 @@ class RequestHandlerRegisterer {
 };
 
 #define REGISTER_REQUEST_HANDLER(ClassName) \
-  static RequestHandlerRegisterer<ClassName> ClassName##__registerer(#ClassName)*/
+   static RequestHandlerRegisterer<ClassName> ClassName##__registerer(#ClassName)
 
 #endif
