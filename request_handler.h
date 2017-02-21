@@ -99,6 +99,7 @@ class RequestHandler {
   virtual Status HandleRequest(const Request& request, Response* response) = 0;
 
   static std::unique_ptr<RequestHandler> CreateByName(const std::string type);
+  virtual std::string GetName() = 0;
 };
 
 extern std::map<std::string, std::unique_ptr<RequestHandler> (*)(void)>* request_handler_builders;

@@ -39,7 +39,8 @@ all: server
 clean:
 	rm -f config_parser server *_test *.o *.a *.gcno *.gcda *.gcov
 
-server: server_main.o server.o config_parser.o echo_handler.o request_handler.o static_file_handler.o not_found_handler.o
+server: server_main.o server.o config_parser.o echo_handler.o request_handler.o static_file_handler.o not_found_handler.o \
+		status_counter.o status_handler.o
 	$(CXX) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
 config_parser: config_parser.cc config_parser_main.cc

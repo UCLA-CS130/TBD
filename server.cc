@@ -8,9 +8,7 @@
 #include <ctime>
 #include <utility>
 #include "server.h"
-#include "echo_handler.h"
-#include "static_file_handler.h"
-#include "not_found_handler.h"
+#include "status_counter.h"
 
 using boost::asio::ip::tcp;
 
@@ -51,12 +49,17 @@ std::string Server::handle_read(const char* data) {
     std::string longest_prefix = find_uri_prefix(request->uri());
     RequestHandler::Status status = handler_map_[longest_prefix]->HandleRequest(*request, &response);
 
+    // update status counter
+    StatusCounter::get_instance().request_count_++;
+
     // TODO: check status
     if (status == RequestHandler::OK) {
         std::cout << "handle request OK!" << std::endl;
+        StatusCounter::get_instance().handler_info_map_[longest_prefix]->increment_count(200);
     } else if (status == RequestHandler::FILE_NOT_FOUND) {
         std::cout << "FILE_NOT_FOUND" << std::endl;
         handler_map_["default"]->HandleRequest(*request, &response);
+        StatusCounter::get_instance().handler_info_map_[longest_prefix]->increment_count(404);
     }
     return response.ToString();
 }
@@ -72,6 +75,18 @@ void Server::create_handler_map(NginxConfig* config) {
             handler_map_[uri_prefix]->Init(uri_prefix, *(statements[i]->child_block_));
         } else if (statements[i]->tokens_[0] == "default") {
             handler_map_["default"] = RequestHandler::CreateByName("NotFoundHandler");
+        }
+    }
+
+    init_status_counter();
+}
+
+void Server::init_status_counter() {
+    if (handler_map_.find("/status") != handler_map_.end()) {
+        for (auto it = handler_map_.begin(); it != handler_map_.end(); it++) {
+            std::string uri_prefix = it->first;
+            std::string handler_name = it->second->GetName();
+            StatusCounter::get_instance().handler_info_map_[uri_prefix] = std::unique_ptr<HandlerInfo>(new HandlerInfo(handler_name));
         }
     }
 }

@@ -12,6 +12,10 @@ path /static2 StaticFileHandler {
     root hw4/;
 }
 
+path /status StatusHandler {
+    root ./;
+}
+
 default NotFoundHandler {
     root ./;
 }

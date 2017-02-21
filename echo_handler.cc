@@ -17,3 +17,7 @@ EchoHandler::Status EchoHandler::HandleRequest(const Request& request, Response*
     response->SetBody(request.raw_request());
     return Status::OK;
 }
+
+std::string EchoHandler::GetName() {
+    return "EchoHandler";
+}

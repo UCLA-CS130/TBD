@@ -14,6 +14,7 @@ public:
     void run();
     std::string handle_read(const char* data);
     void create_handler_map(NginxConfig* config);
+    void init_status_counter();
     std::string find_uri_prefix(std::string uri);
     bool is_uri_prefix(std::string short_str, std::string long_str);
 private:

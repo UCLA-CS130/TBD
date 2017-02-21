@@ -59,3 +59,7 @@ StaticFileHandler::Status StaticFileHandler::HandleRequest(const Request& reques
         return FILE_NOT_FOUND;
     }
 }
+
+std::string StaticFileHandler::GetName() {
+    return "StaticFileHandler";
+}

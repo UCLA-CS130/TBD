@@ -9,6 +9,9 @@ public:
     virtual ~StatusHandler();
     virtual Status Init(const std::string& uri_prefix, const NginxConfig& config);
     virtual Status HandleRequest(const Request& request, Response* response);
+    virtual std::string GetName();
+private:
+    std::string CreateResponseBody();
 };
 
 REGISTER_REQUEST_HANDLER(StatusHandler);

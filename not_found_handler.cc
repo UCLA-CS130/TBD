@@ -17,5 +17,9 @@ NotFoundHandler::Status NotFoundHandler::HandleRequest(const Request& request, R
 
     std::string body = "404 File Not Found";
     response->SetBody(body);
-    return OK;
+    return FILE_NOT_FOUND;
+}
+
+std::string NotFoundHandler::GetName() {
+    return "NotFoundHandler";
 }
