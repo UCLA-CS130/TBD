@@ -1,3 +1,5 @@
+#include "status_counter.h"
+
 HandlerInfo::HandlerInfo(std::string handler_name)
     : handler_name_(handler_name) {}
 
@@ -7,4 +9,11 @@ void HandlerInfo::increment_count(int status_code) {
     } else {
         status_code_map_[status_code] += 1;
     }
+}
+
+StatusCounter::StatusCounter() {}
+
+StatusCounter& StatusCounter::get_instance() {
+    static StatusCounter instance;
+    return instance;
 }

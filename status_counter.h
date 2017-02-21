@@ -3,21 +3,27 @@
 
 #include <string>
 #include <map>
-
-class StatusCounter {
-public:
-
-private:
-};
+#include <unordered_map>
 
 class HandlerInfo {
 public:
     HandlerInfo(std::string handler_name);
     void increment_count(int status_code);
 
-private:
     std::string handler_name_;
     std::map<int, int> status_code_map_;
+};
+
+class StatusCounter {
+public:
+    static StatusCounter& get_instance();
+    StatusCounter(StatusCounter const&) = delete;
+    void operator=(StatusCounter const&) = delete;
+
+    int request_count_ = 0;
+    std::unordered_map<std::string, HandlerInfo*> handler_info_map_;
+private:
+    StatusCounter();
 };
 
 #endif
