@@ -7,9 +7,8 @@ StaticFileHandler::~StaticFileHandler() {}
 
 std::string StaticFileHandler::GetMimeType(const std::string& file_path) {
     size_t pos = file_path.find_last_of(".");
-    std::cout << pos << std::endl;
-    // TODO: pos is 0 on example_config, so not setting content-type
-    if (pos == std::string::npos) {
+    
+    if (pos == std::string::npos || pos == 0) {
         return "text/plain";
     }
 

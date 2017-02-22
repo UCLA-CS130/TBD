@@ -1,21 +1,21 @@
 port   8080;
 
 path /foo EchoHandler {
-    root ./;
+    root .;
 }
 
 path /static1 StaticFileHandler {
-    root ./;
+    root .;
 }
 
 path /static2 StaticFileHandler {
-    root hw4/;
+    root hw4;
 }
 
 path /status StatusHandler {
-    root ./;
+    root .;
 }
 
 default NotFoundHandler {
-    root ./;
+    root .;
 }
