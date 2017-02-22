@@ -60,6 +60,7 @@ public:
     void SetStatus(const ResponseCode response_code);
     void AddHeader(const std::string& header_name, const std::string& header_value);
     void SetBody(const std::string& body);
+    int GetStatus();
 
     std::string ToString();
 

@@ -51,17 +51,15 @@ std::string Server::handle_read(const char* data) {
 
     // update status counter
     StatusCounter::get_instance().request_count_++;
+    StatusCounter::get_instance().status_code_map_[request->uri()][response.GetStatus()]++;
 
-    // TODO: check status
-    // TODO: Content-Type set twice when no prefix match
     if (status == RequestHandler::OK) {
         std::cout << "handle request OK!" << std::endl;
-        StatusCounter::get_instance().status_code_map_[request->uri()][200]++;
-    } else if (status == RequestHandler::FILE_NOT_FOUND &&
-               handler_map_[longest_prefix]->GetName() != "NotFoundHandler") {
+    } else if (status == RequestHandler::FILE_NOT_FOUND) {
         std::cout << "FILE_NOT_FOUND" << std::endl;
-        handler_map_["default"]->HandleRequest(*request, &response);
-        StatusCounter::get_instance().status_code_map_[request->uri()][404]++;
+
+        if (handler_map_[longest_prefix]->GetName() != "NotFoundHandler")
+            handler_map_["default"]->HandleRequest(*request, &response);
     }
 
     return response.ToString();

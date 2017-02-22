@@ -58,6 +58,7 @@ StaticFileHandler::Status StaticFileHandler::HandleRequest(const Request& reques
         response->SetBody(file_content);
         return OK;
     } else {
+        response->SetStatus(Response::ResponseCode::FILE_NOT_FOUND);
         return FILE_NOT_FOUND;
     }
 }

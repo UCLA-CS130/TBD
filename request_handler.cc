@@ -109,6 +109,17 @@ void Response::AddHeader(const std::string& header_name, const std::string& head
     headers_.push_back(std::make_pair(header_name, header_value));
 }
 
+int Response::GetStatus() {
+    switch(status_code_) {
+    case OK:
+        return 200;
+    case FILE_NOT_FOUND:
+        return 404;
+    default:
+        return 500;
+    }
+}
+
 
 // RequestHandler Implementations
 
