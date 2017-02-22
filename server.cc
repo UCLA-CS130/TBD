@@ -55,11 +55,11 @@ std::string Server::handle_read(const char* data) {
     // TODO: check status
     if (status == RequestHandler::OK) {
         std::cout << "handle request OK!" << std::endl;
-        StatusCounter::get_instance().handler_info_map_[longest_prefix]->increment_count(200);
+        StatusCounter::get_instance().status_code_map_[request->uri()][200]++;
     } else if (status == RequestHandler::FILE_NOT_FOUND) {
         std::cout << "FILE_NOT_FOUND" << std::endl;
         handler_map_["default"]->HandleRequest(*request, &response);
-        StatusCounter::get_instance().handler_info_map_[longest_prefix]->increment_count(404);
+        StatusCounter::get_instance().status_code_map_[request->uri()][404]++;
     }
     return response.ToString();
 }
@@ -86,7 +86,7 @@ void Server::init_status_counter() {
         for (auto it = handler_map_.begin(); it != handler_map_.end(); it++) {
             std::string uri_prefix = it->first;
             std::string handler_name = it->second->GetName();
-            StatusCounter::get_instance().handler_info_map_[uri_prefix] = std::unique_ptr<HandlerInfo>(new HandlerInfo(handler_name));
+            StatusCounter::get_instance().handler_name_map_[uri_prefix] = handler_name;
         }
     }
 }

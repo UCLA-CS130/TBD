@@ -26,13 +26,19 @@ std::string StatusHandler::GetName() {
 }
 
 std::string StatusHandler::CreateResponseBody() {
-    std::string response_body = "Number of requests: " + 
+    std::string response_body = "Total number of requests: " +
                                 std::to_string(StatusCounter::get_instance().request_count_) + "\n\n";
-    for (auto it = StatusCounter::get_instance().handler_info_map_.begin(); 
-            it != StatusCounter::get_instance().handler_info_map_.end(); it++) {
-        response_body += it->first + " " + it->second->handler_name_ + "\n";
-        
-        for (auto i = it->second->status_code_map_.begin(); i != it->second->status_code_map_.end(); i++) {
+    for (auto it = StatusCounter::get_instance().handler_name_map_.begin();
+            it != StatusCounter::get_instance().handler_name_map_.end(); it++) {
+        response_body += it->first + " " + it->second + "\n\n";
+    }
+
+    response_body += "Response code count: \n";
+    for (auto it = StatusCounter::get_instance().status_code_map_.begin();
+            it != StatusCounter::get_instance().status_code_map_.end(); it++) {
+        response_body += it->first + "\n";
+
+        for (auto i = it->second.begin(); i != it->second.end(); i++) {
             response_body += "\t" + std::to_string(i->first) + ": " + std::to_string(i->second) + "\n";
         }
         response_body += "\n";

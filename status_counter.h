@@ -4,16 +4,6 @@
 #include <string>
 #include <map>
 #include <unordered_map>
-#include <memory>
-
-class HandlerInfo {
-public:
-    HandlerInfo(std::string handler_name);
-    void increment_count(int status_code);
-
-    std::string handler_name_;
-    std::map<int, int> status_code_map_;
-};
 
 class StatusCounter {
 public:
@@ -22,7 +12,8 @@ public:
     void operator=(StatusCounter const&) = delete;
 
     int request_count_ = 0;
-    std::unordered_map<std::string, std::unique_ptr<HandlerInfo>> handler_info_map_;
+    std::unordered_map<std::string, std::string> handler_name_map_;
+    std::unordered_map<std::string, std::map<int, int>> status_code_map_;
 private:
     StatusCounter();
 };
