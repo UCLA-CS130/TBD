@@ -84,7 +84,8 @@ class RequestHandler {
 
   enum Status {
     OK = 0,
-    FILE_NOT_FOUND = 404
+    FILE_NOT_FOUND = 404,
+    INTERNAL_ERROR = 500
   };
   
   // Initializes the handler. Returns a response code indicating success or

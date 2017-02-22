@@ -40,8 +40,12 @@ bool StaticFileHandler::ReadFile(const std::string& file_path, std::string& file
 
 StaticFileHandler::Status StaticFileHandler::Init(const std::string& uri_prefix, const NginxConfig& config) {
     uri_prefix_ = uri_prefix;
+
+    if (config.statements_.size() == 0 || config.statements_[0]->tokens_.size() < 2)
+        return INTERNAL_ERROR;
+
     root_path_ = config.statements_[0]->tokens_[1];
-    return Status::OK;
+    return OK;
 }
 
 StaticFileHandler::Status StaticFileHandler::HandleRequest(const Request& request, Response* response) {

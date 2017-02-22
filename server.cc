@@ -72,8 +72,11 @@ void Server::create_handler_map(NginxConfig* config) {
             std::string uri_prefix = statements[i]->tokens_[1];
             handler_map_[uri_prefix] = RequestHandler::CreateByName(statements[i]->tokens_[2]);
 
-            // TODO: Check status
-            handler_map_[uri_prefix]->Init(uri_prefix, *(statements[i]->child_block_));
+            RequestHandler::Status status = handler_map_[uri_prefix]->Init(uri_prefix, *(statements[i]->child_block_));
+            if (status == RequestHandler::Status::INTERNAL_ERROR) {
+                std::cout << "Bad config file. Server exiting." << std::endl;
+                exit(1);
+            }
         } else if (statements[i]->tokens_[0] == "default") {
             handler_map_["default"] = RequestHandler::CreateByName("NotFoundHandler");
         }
