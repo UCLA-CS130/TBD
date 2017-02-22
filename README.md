@@ -39,7 +39,7 @@ make integration
 
 ## Source Code Layout
 * All the source code is in the base directory.
-* The main function is decalared in `server_main.cc`.
+* The main function is declared in `server_main.cc`.
 * `Request` and `Response` classes are defined in `request_handler.h` and `request_handler.cc`.
 * Other than these two, each `.h` and `.cc` file only contains definition of a single class.
 * Unit tests for `ExampleClass` are in `example_class_test.cc`.

@@ -54,9 +54,9 @@ std::string Server::handle_read(const char* data) {
     StatusCounter::get_instance().status_code_map_[request->uri()][response.GetStatus()]++;
 
     if (status == RequestHandler::OK) {
-        std::cout << "handle request OK!" << std::endl;
+        std::cout << "Handle request returned status OK." << std::endl;
     } else if (status == RequestHandler::FILE_NOT_FOUND) {
-        std::cout << "FILE_NOT_FOUND" << std::endl;
+        std::cout << "Handle request returned status FILE_NOT_FOUND." << std::endl;
 
         if (handler_map_[longest_prefix]->GetName() != "NotFoundHandler")
             handler_map_["default"]->HandleRequest(*request, &response);
