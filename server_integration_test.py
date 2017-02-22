@@ -21,8 +21,8 @@ expected_echo_response = """HTTP/1.1 200 OK\r
 Content-Type: text/plain\r
 \r
 GET /foo HTTP/1.1\r
+User-Agent: curl/7.35.0\r
 Host: localhost:8080\r
-User-Agent: curl/7.43.0\r
 Accept: */*\r\n\r\n"""
 
 if echo_response != expected_echo_response:
