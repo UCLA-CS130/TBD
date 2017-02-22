@@ -90,19 +90,23 @@ request_handler_test : request_handler_test.o request_handler.o gmock_main.a
 echo_handler_test : echo_handler_test.o echo_handler.o request_handler.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
-server_test : config_parser.o server.o server_test.o request_handler.o echo_handler.o server_config.o http_request.o static_file_handler.o \
-				 handler_factory.o gmock_main.a
+server_test : config_parser.o server.o server_test.o request_handler.o echo_handler.o  static_file_handler.o \
+				 status_counter.o status_handler.o not_found_handler.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
 config_parser_test : config_parser.o config_parser_test.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
-static_file_handler_test : static_file_handler.o static_file_handler_test.o http_request.o request_handler.o gmock_main.a
+static_file_handler_test : static_file_handler.o static_file_handler_test.o request_handler.o not_found_handler.o gmock_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
+
+not_found_handler_test : not_found_handler_test.o not_found_handler.o request_handler.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
 
 TESTS = config_parser_test server_test echo_handler_test \
-		request_handler_test static_file_handler_test
+		request_handler_test static_file_handler_test \
+		not_found_handler_test
 test : $(TESTS)
 	for t in $^ ; do ./$$t ; done
 
