@@ -103,10 +103,16 @@ static_file_handler_test : static_file_handler.o static_file_handler_test.o requ
 not_found_handler_test : not_found_handler_test.o not_found_handler.o request_handler.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
+status_handler_test : status_handler_test.o status_handler.o request_handler.o status_counter.o gmock_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
+
+status_counter_test : status_counter_test.o status_counter.o gmock_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
+
 
 TESTS = config_parser_test server_test echo_handler_test \
 		request_handler_test static_file_handler_test \
-		not_found_handler_test
+		not_found_handler_test status_handler_test
 test : $(TESTS)
 	for t in $^ ; do ./$$t ; done
 
