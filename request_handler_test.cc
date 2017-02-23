@@ -17,6 +17,7 @@ TEST(RequestTest, ParseRequestTest) {
     EXPECT_EQ("curl/7.35.0", request->headers()[0].second);
 }
 
+
 // Response Tests
 
 TEST(ResponseTest, CreateResponseTest) {
@@ -32,4 +33,27 @@ TEST(ResponseTest, CreateResponseTest) {
 
 // RequestHandler Tests
 
+class RequestHandlerTest : public ::testing::Test {
+protected:
+    std::string CreateByName(const std::string& type) {
+        auto handler = RequestHandler::CreateByName(type);
+        return handler->GetName();
+    }
+};
+
+TEST_F(RequestHandlerTest, CreateEchoTest) {
+    EXPECT_EQ("EchoHandler", CreateByName("EchoHandler"));
+}
+
+TEST_F(RequestHandlerTest, CreateStaticTest) {
+    EXPECT_EQ("StaticFileHandler", CreateByName("StaticFileHandler"));
+}
+
+TEST_F(RequestHandlerTest, CreateNotFoundTest) {
+    EXPECT_EQ("NotFoundHandler", CreateByName("NotFoundHandler"));
+}
+
+TEST_F(RequestHandlerTest, CreateStatusTest) {
+    EXPECT_EQ("StatusHandler", CreateByName("StatusHandler"));
+}
 

@@ -84,7 +84,7 @@ $(basename $(wildcard %.o)) : %.cc
 $(basename $(wildcard %_test.o)) : %_test.cc $(GMOCK_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c %_test.cc
 
-request_handler_test : request_handler_test.o request_handler.o gmock_main.a
+request_handler_test : request_handler_test.o request_handler.o echo_handler.o static_file_handler.o not_found_handler.o status_handler.o status_counter.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
 echo_handler_test : echo_handler_test.o echo_handler.o request_handler.o gmock_main.a
