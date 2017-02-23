@@ -9,7 +9,7 @@ std::unique_ptr<Request> Request::Parse(const std::string & raw_request) {
     new_request->raw_request_ = raw_request;
     
     std::vector<std::string> lines = split_lines(raw_request);
-    for (size_t i = 0; i < lines.size() - 1; i++) {
+    for (size_t i = 0; i < lines.size(); i++) {
         if (i == 0) {
         // parse first line of the request
             auto first_space = lines[i].find(" ");
