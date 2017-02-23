@@ -19,6 +19,15 @@ TEST(RequestTest, ParseRequestTest) {
 
 // Response Tests
 
+TEST(ResponseTest, CreateResponseTest) {
+    Response r;
+    r.SetStatus(Response::ResponseCode::OK);
+    r.AddHeader("Field", "Value");
+    r.SetBody("Body");
+
+    EXPECT_EQ(Response::ResponseCode::OK, r.GetStatus());
+    EXPECT_EQ("HTTP/1.1 200 OK\r\nField: Value\r\n\r\nBody", r.ToString());
+}
 
 
 // RequestHandler Tests
