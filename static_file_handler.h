@@ -4,17 +4,21 @@
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include "request_handler.h"
-#include "http_request.h"
 
 class StaticFileHandler : public RequestHandler {
 public:
-    StaticFileHandler(std::string file_path);
+    StaticFileHandler();
     virtual ~StaticFileHandler();
-    virtual std::string build_response();
-    virtual std::string get_mime_type();
-    virtual std::string read_file(bool &cannot_open_file);
+    std::string GetMimeType(const std::string& file_path);
+    bool ReadFile(const std::string& file_path, std::string& file_content);
+    virtual Status Init(const std::string& uri_prefix, const NginxConfig& config);
+    virtual Status HandleRequest(const Request& request, Response* response);
+    virtual std::string GetName();
 private:
-    std::string file_path_;
+    std::string uri_prefix_;
+    std::string root_path_;
 };
+
+REGISTER_REQUEST_HANDLER(StaticFileHandler);
 
 #endif

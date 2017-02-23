@@ -1,9 +1,21 @@
-server {
-  listen   8080;
-  root /home/ubuntu/sites/foo/;
-  path {
-    /static1/ ./;
-    /static2/ hw4/;
-    /echo/ /foo;
-  }
+port   8080;
+
+path /foo EchoHandler {
+    root .;
+}
+
+path /static1 StaticFileHandler {
+    root .;
+}
+
+path /static2 StaticFileHandler {
+    root hw4;
+}
+
+path /status StatusHandler {
+    root .;
+}
+
+default NotFoundHandler {
+    root .;
 }

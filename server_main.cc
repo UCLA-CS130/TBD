@@ -1,7 +1,6 @@
 #include <iostream>
 #include "server.h"
 #include "config_parser.h"
-#include "server_config.h"
 
 int main(int argc, char* argv[]) {
     if (argc != 2) {
@@ -17,8 +16,7 @@ int main(int argc, char* argv[]) {
 
         // start server and wait for requests
         boost::asio::io_service io_service;
-        ServerConfig server_config(&config);
-        Server server(io_service, &server_config);
+        Server server(io_service, &config);
         server.run();
     } catch (std::exception& e) {
         std::cerr << e.what() << std::endl;

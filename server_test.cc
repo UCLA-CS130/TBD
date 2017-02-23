@@ -10,8 +10,9 @@ protected:
         parser.Parse("path_config", &config);
 
         boost::asio::io_service io_service;
-        ServerConfig server_config(&config);
-        Server server(io_service, &server_config);
+        //ServerConfig server_config(&config);
+        //Server server(io_service, &server_config);
+        Server server(io_service, &config);
         return server.handle_read(data);
     }
 };
