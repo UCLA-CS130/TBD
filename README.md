@@ -7,22 +7,34 @@
 ## How to build, test, and run
 
 ### To build the server
-```make```
+```
+make
+```
 
 ### To build and run tests
-```make test```
+```
+make test
+```
 
 ### To remove object and binary files
-```make clean```
+```
+make clean
+```
 
 ### To analyze test coverage
-```make coverage```
+```
+make coverage
+```
 
 ### To run the integration test
-```make integration```
+```
+make integration
+```
 
 ### To run the server after building it
-```./server <config_file>```
+```
+./server <config_file>
+```
 
 
 ## Source Code Layout
