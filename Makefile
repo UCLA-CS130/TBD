@@ -119,7 +119,9 @@ test : $(TESTS)
 coverage : CXXFLAGS += -fprofile-arcs -ftest-coverage
 coverage : test
 	gcov -r server.cc; gcov -r config_parser.cc; \
-	gcov -r echo_handler.cc; gcov -r request_handler.cc;
+	gcov -r echo_handler.cc; gcov -r request_handler.cc; \
+	gcov -r static_file_handler.cc; gcov -r status_handler.cc; \
+	gcov -r not_found_handler.cc; gcov -r status_counter.cc;
 
 integration : 
 	python server_integration_test.py
