@@ -84,32 +84,44 @@ $(basename $(wildcard %.o)) : %.cc
 $(basename $(wildcard %_test.o)) : %_test.cc $(GMOCK_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c %_test.cc
 
-request_handler_test : request_handler_test.o request_handler.o gmock_main.a
+request_handler_test : request_handler_test.o request_handler.o echo_handler.o static_file_handler.o not_found_handler.o status_handler.o status_counter.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
 echo_handler_test : echo_handler_test.o echo_handler.o request_handler.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
-server_test : config_parser.o server.o server_test.o request_handler.o echo_handler.o server_config.o http_request.o static_file_handler.o \
-				 handler_factory.o gmock_main.a
+server_test : config_parser.o server.o server_test.o request_handler.o echo_handler.o  static_file_handler.o \
+				 status_counter.o status_handler.o not_found_handler.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
 config_parser_test : config_parser.o config_parser_test.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
-static_file_handler_test : static_file_handler.o static_file_handler_test.o http_request.o request_handler.o gmock_main.a
+static_file_handler_test : static_file_handler.o static_file_handler_test.o request_handler.o not_found_handler.o gmock_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
+
+not_found_handler_test : not_found_handler_test.o not_found_handler.o request_handler.o gmock_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
+
+status_handler_test : status_handler_test.o status_handler.o request_handler.o status_counter.o gmock_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
+
+status_counter_test : status_counter_test.o status_counter.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
 
 TESTS = config_parser_test server_test echo_handler_test \
-		request_handler_test static_file_handler_test
+		request_handler_test static_file_handler_test \
+		not_found_handler_test status_handler_test
 test : $(TESTS)
 	for t in $^ ; do ./$$t ; done
 
 coverage : CXXFLAGS += -fprofile-arcs -ftest-coverage
 coverage : test
 	gcov -r server.cc; gcov -r config_parser.cc; \
-	gcov -r echo_handler.cc; gcov -r request_handler.cc;
+	gcov -r echo_handler.cc; gcov -r request_handler.cc; \
+	gcov -r static_file_handler.cc; gcov -r status_handler.cc; \
+	gcov -r not_found_handler.cc; gcov -r status_counter.cc;
 
 integration : 
 	python server_integration_test.py
