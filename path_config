@@ -17,7 +17,7 @@ path /status StatusHandler {
 }
 
 path /reverse_proxy ReverseProxyHandler {
-    remote_host localhost
+    remote_host localhost;
     remote_port 1234;
 }
 
