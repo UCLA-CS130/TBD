@@ -16,6 +16,11 @@ path /status StatusHandler {
     root .;
 }
 
+path /reverse_proxy ReverseProxyHandler {
+    remote_host localhost
+    remote_port 1234;
+}
+
 default NotFoundHandler {
     root .;
 }
