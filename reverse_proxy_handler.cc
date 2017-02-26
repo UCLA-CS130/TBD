@@ -67,7 +67,7 @@ ReverseProxyHandler::Status ReverseProxyHandler::HandleRequest(const Request& re
     std::cout << "Successfully connected!\n";
 
     std::string request_string = std::string("GET /echo HTTP/1.1\r\n") +
-                          "Host: " + remote_host_ + "\r\n" +
+                          "Host: " + remote_host_ +":" + std::to_string(remote_port_) + "\r\n" +
                           "Connection: keep-alive\r\n" +
                           "Accept-Encoding: gzip, deflate, sdch, br\r\n" +
                           "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8\r\n" +
