@@ -20,7 +20,7 @@ ReverseProxyHandler::Status ReverseProxyHandler::Init(const std::string& uri_pre
                 remote_host_ = config.statements_[i]->tokens_[1];
                 remote_host_found = true;
             } else if (config.statements_[i]->tokens_[0] == "remote_port") {
-                remote_port_ = std::stoi(config.statements_[i]->tokens_[1];
+                remote_port_ = std::stoi(config.statements_[i]->tokens_[1]);
                 remote_port_found = true;
             } else {
                 return INTERNAL_ERROR;
@@ -39,6 +39,10 @@ ReverseProxyHandler::Status ReverseProxyHandler::Init(const std::string& uri_pre
 
 ReverseProxyHandler::Status ReverseProxyHandler::HandleRequest(const Request& request, Response* response) {
     // TODO: Implement reverse proxy request
+    response->SetStatus(Response::ResponseCode::OK);
+    response->AddHeader("Content-Type", "text/plain");
+    response->SetBody(request.raw_request());
+    return Status::OK;
 }
 
 std::string ReverseProxyHandler::GetName() {
