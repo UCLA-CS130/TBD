@@ -17,8 +17,7 @@ path /status StatusHandler {
 }
 
 path /reverse_proxy ReverseProxyHandler {
-    remote_host localhost;
-    remote_port 1234;
+    remote_host www.boost.org/doc/libs/1_63_0/more/getting_started/index.html;
 }
 
 default NotFoundHandler {

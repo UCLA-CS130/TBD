@@ -13,7 +13,8 @@ public:
 private:
     std::string uri_prefix_;
     std::string remote_host_;
-    int remote_port_;
+    std::string remote_port_;
+    std::string remote_uri_;
 };
 
 REGISTER_REQUEST_HANDLER(ReverseProxyHandler);
