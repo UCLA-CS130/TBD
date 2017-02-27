@@ -27,7 +27,26 @@ TEST(ResponseTest, CreateResponseTest) {
     r.SetBody("Body");
 
     EXPECT_EQ(Response::ResponseCode::OK, r.GetStatus());
+    EXPECT_EQ("Body", r.body());
     EXPECT_EQ("HTTP/1.1 200 OK\r\nField: Value\r\n\r\nBody", r.ToString());
+}
+
+TEST(ResponseTest, ParseResponseTest) {
+    std::string raw = "HTTP/1.1 302 Found\r\n"
+                      "Location: http://www.ucla.edu/\r\n"
+                      "\r\n"
+                      "Body\n";
+    auto response = Response::Parse(raw);
+
+    EXPECT_EQ(302, response->GetStatus());
+    EXPECT_EQ("Body\r\n", response->body());
+    EXPECT_EQ(1, response->headers().size());
+    EXPECT_EQ("Location", response->headers().at(0).first);
+    EXPECT_EQ("http://www.ucla.edu/", response->headers()[0].second);
+    EXPECT_EQ("HTTP/1.1 302 Proxy\r\n"
+              "Location: http://www.ucla.edu/\r\n"
+              "\r\n"
+              "Body\r\n", response->ToString());
 }
 
 
