@@ -10,7 +10,7 @@ static std::vector<std::string> split_lines(std::string str) {
     std::vector<std::string> lines;
 
     // tokenize each line by newline
-    while(std::getline(ss,line,'\n')){
+    while(std::getline(ss,line,'\n')) {
         // remove carriage return from line
         if (line[line.size()-1] == '\r') {
             lines.push_back(line.substr(0, line.size()-1));
