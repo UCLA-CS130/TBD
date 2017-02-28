@@ -107,10 +107,11 @@ std::unique_ptr<Response> Response::Parse(const std::string& raw_response) {
 
     // parse body of the response
     i++;
-    while (i < lines.size()) {
-        new_response->response_body_ += lines[i] + "\r\n";
+    while (i < lines.size()-1) {
+        new_response->response_body_ += lines[i] + "\n";
         i++;
     }
+    new_response->response_body_ += lines[i]; // avoid putting extra new line at end
 
     return new_response;
 }

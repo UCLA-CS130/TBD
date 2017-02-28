@@ -79,7 +79,12 @@ ReverseProxyHandler::Status ReverseProxyHandler::HandleRequest(const Request& re
 
     std::cout << "Successfully connected!\n";
 
-    std::string request_string = std::string("GET ") + remote_uri_ + request_uri.substr(uri_prefix_.size()) + " HTTP/1.1\r\n" +
+    std::string uri = remote_uri_ + request_uri.substr(uri_prefix_.size());
+    if (uri == "") {
+        uri = "/";
+    }
+
+    std::string request_string = std::string("GET ") + uri + " HTTP/1.1\r\n" +
                                  "Host: " + remote_host_ + ":" + remote_port_;
 
 
@@ -88,9 +93,8 @@ ReverseProxyHandler::Status ReverseProxyHandler::HandleRequest(const Request& re
     // if (remote_port_ != "http") {
     //     request_string += ":" + (remote_port_); // Port number
     // }
-    request_string += std::string("\r\nConnection: keep-alive\r\n") +
-                      "Accept: text/html\r\n" +
-                      "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8\r\n" +
+    request_string += std::string("\r\n") +
+                      "Accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8\r\n" +
                       "Accept-Encoding: gzip, deflate, sdch\r\n" +
                       "Accept-Language: en-US,en;q=0.8\r\n" +
                       "\r\n";
@@ -121,23 +125,34 @@ ReverseProxyHandler::Status ReverseProxyHandler::HandleRequest(const Request& re
 
         
         //remote_response += std::string(std::begin(buf), std::end(buf));
-        std::cout.write(buf.data(), len);
+        //std::cout.write(buf.data(), len);
         remote_response += std::string(buf.data(), len);
 
         
     }
 
-    std::cout << remote_response << std::endl;
+    //std::cout << remote_response << std::endl;
     //std::unique_ptr<Request> response_as_request = Request::Parse(remote_response);
 
-    response->SetStatus(Response::ResponseCode::OK);
+    // response->SetStatus(Response::ResponseCode::OK);
+
+    *response = *(Response::Parse(remote_response).get());
+
+    std::string content_length;
+    using Headers = std::vector<std::pair<std::string, std::string>>;
+    Headers headers = response->headers();
+    for (std::size_t i = 0; i < headers.size(); i++) {
+        std::cout << headers[i].first << ": " << headers[i].second << std::endl;
+    }
+
+    
+    std::cout << "Actual Content-Length: " << response->body().size() << std::endl;
 
 
-
-    response->AddHeader("Content-Type", "text/plain");
-    //response->AddHeader("Content-Encoding", "gzip");
-    response->SetBody(request.raw_request());
-    response->SetBody(remote_response);
+    // response->AddHeader("Content-Type", "text/plain");
+    // //response->AddHeader("Content-Encoding", "gzip");
+    // response->SetBody(request.raw_request());
+    //response->SetBody(remote_response);
     return Status::OK;
 }
 
