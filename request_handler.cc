@@ -2,6 +2,26 @@
 #include "sstream"
 #include "request_handler.h"
 
+// Helper Function(s)
+
+static std::vector<std::string> split_lines(std::string str) {
+    std::stringstream ss(str);
+    std::string line;
+    std::vector<std::string> lines;
+
+    // tokenize each line by newline
+    while(std::getline(ss,line,'\n')) {
+        // remove carriage return from line
+        if (line[line.size()-1] == '\r') {
+            lines.push_back(line.substr(0, line.size()-1));
+        } else {
+            lines.push_back(line.substr(0, line.size()));
+        }
+    }
+    return lines;
+}
+
+
 // Request Implementations
 
 std::unique_ptr<Request> Request::Parse(const std::string & raw_request) {
@@ -18,7 +38,7 @@ std::unique_ptr<Request> Request::Parse(const std::string & raw_request) {
             auto second_space = temp.find(" ");
             new_request->uri_ = temp.substr(0, second_space);
             new_request->version_ = temp.substr(second_space + 1);
-        } else {
+        } else if (!lines[i].empty()) {
         // parse header fields of the request
             auto first_space = lines[i].find(" ");
             std::string field = lines[i].substr(0, first_space - 1);
@@ -28,21 +48,6 @@ std::unique_ptr<Request> Request::Parse(const std::string & raw_request) {
     }
     
     return new_request;
-}
-
-std::vector<std::string> Request::split_lines(std::string request) {
-    std::stringstream ss(request);
-    std::string line;
-    std::vector<std::string> lines;
-
-    if (!request.empty()) {
-        // tokenize each line by newline
-        while(std::getline(ss,line,'\n')){
-            // remove carriage return from line
-            lines.push_back(line.substr(0, line.size()-1));
-        }
-    }
-    return lines;
 }
 
 std::string Request::raw_request() const {
@@ -73,6 +78,43 @@ Headers Request::headers() const {
 
 // Response Implementations
 
+std::unique_ptr<Response> Response::Parse(const std::string& raw_response) {
+    std::unique_ptr<Response> new_response(new Response());
+    std::vector<std::string> lines = split_lines(raw_response);
+
+    // parse first line of the response
+    if (lines.size() > 0) {
+        auto first_space = lines[0].find(" ");
+        std::string temp = lines[0].substr(first_space + 1);
+        auto second_space = temp.find(" ");
+        std::string status_code = temp.substr(0, second_space);
+        try {
+            new_response->status_code_ = std::stoi(status_code);
+        } catch (...) {
+            return std::unique_ptr<Response>();
+        }
+    }
+
+    // parse header fields of the response
+    unsigned int i = 1;
+    while (i < lines.size() && !lines[i].empty()) {
+        auto first_space = lines[i].find(" ");
+        std::string field = lines[i].substr(0, first_space - 1);
+        std::string value = lines[i].substr(first_space + 1);
+        new_response->headers_.push_back(std::make_pair(field, value));
+        i++;
+    }
+
+    // parse body of the response
+    i++;
+    while (i < lines.size()) {
+        new_response->response_body_ += lines[i] + "\r\n";
+        i++;
+    }
+
+    return new_response;
+}
+
 std::string Response::ToString() {
     std::string response = build_status_line();
     for (auto const& header: headers_)
@@ -88,8 +130,11 @@ std::string Response::build_status_line() {
         status_line += " 200 OK";
     } else if (status_code_ == ResponseCode::FILE_NOT_FOUND) {
         status_line += " 404 Not Found";
+
     } else if (status_code_ == ResponseCode::FOUND) {
         status_line += " 302 Found";
+    } else {
+        status_line += " " + std::to_string(status_code_) + " Proxy";
     }
 
     return status_line + "\r\n";
@@ -103,7 +148,7 @@ void Response::SetBody(const std::string& body) {
     response_body_ = body;
 }
 
-void Response::SetStatus(ResponseCode response_code) {
+void Response::SetStatus(int response_code) {
     status_code_ = response_code;
 }
 
@@ -112,16 +157,16 @@ void Response::AddHeader(const std::string& header_name, const std::string& head
 }
 
 int Response::GetStatus() {
-    switch(status_code_) {
-    case OK:
-        return 200;
-    case FOUND:
-        return 302;
-    case FILE_NOT_FOUND:
-        return 404;
-    default:
-        return 500;
-    }
+    return status_code_;
+}
+
+std::string Response::body() const {
+    return response_body_;
+}
+
+using Headers = std::vector<std::pair<std::string, std::string>>;
+Headers Response::headers() const {
+    return headers_;
 }
 
 
