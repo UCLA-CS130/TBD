@@ -79,8 +79,10 @@ Headers Request::headers() const {
 // Response Implementations
 
 std::unique_ptr<Response> Response::Parse(const std::string& raw_response) {
+    std::cout << "Raw response: " << raw_response << std::endl;
     std::unique_ptr<Response> new_response(new Response());
     std::vector<std::string> lines = split_lines(raw_response);
+    std::cout << "Splitted lines" << std::endl;
 
     // parse first line of the response
     if (lines.size() > 0) {
@@ -94,7 +96,7 @@ std::unique_ptr<Response> Response::Parse(const std::string& raw_response) {
             return std::unique_ptr<Response>();
         }
     }
-
+    std::cout << "Parsed first line" << std::endl;
     // parse header fields of the response
     unsigned int i = 1;
     while (i < lines.size() && !lines[i].empty()) {
@@ -104,15 +106,19 @@ std::unique_ptr<Response> Response::Parse(const std::string& raw_response) {
         new_response->headers_.push_back(std::make_pair(field, value));
         i++;
     }
+    std::cout << "Parsed header fields" << std::endl;
 
     // parse body of the response
     i++;
-    while (i < lines.size()-1) {
-        new_response->response_body_ += lines[i] + "\n";
+    while (i < lines.size()) {
+        new_response->response_body_ += lines[i];
+        if (i < lines.size()) {
+            new_response->response_body_ += "\n"; // avoid putting new line at end
+        } 
         i++;
     }
-    new_response->response_body_ += lines[i]; // avoid putting extra new line at end
-
+    
+    std::cout << "Returning new response!" << std::endl;
     return new_response;
 }
 

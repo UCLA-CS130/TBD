@@ -1,4 +1,4 @@
-port   8080;
+port   12345;
 
 path /foo EchoHandler {
     root .;
@@ -17,11 +17,11 @@ path /status StatusHandler {
 }
 
 path /reverse_proxy ReverseProxyHandler {
-    remote_host www.boost.org;
+    remote_host localhost:2020/redirect;
 }
 
 path /redirect RedirectHandler {
-    url http://www.iana.org/domains/example/;
+    url http://www.ucla.edu; # note: must have http:// in front of it
 }
 
 default NotFoundHandler {
