@@ -7,6 +7,7 @@
 #include <cstring>
 #include <ctime>
 #include <utility>
+#include <thread>
 #include "server.h"
 #include "status_counter.h"
 
@@ -26,20 +27,23 @@ void Server::run() {
     while (true) {
         tcp::socket socket(io_service_);
         acceptor_.accept(socket);
-
-        char data[MAX_LENGTH];
-        memset(data, 0, MAX_LENGTH);
-        boost::system::error_code error;
-        socket.read_some(boost::asio::buffer(data), error);
-
-        if (error) {
-            std::cout << "Error reading request" << std::endl;
-        } else {
-            std::string message = handle_read(data);
-            boost::asio::write(socket, boost::asio::buffer(message, message.size()));
-        }
-        socket.close();
+        handle_request(socket);
     }
+}
+
+void Server::handle_request(tcp::socket& socket) {
+    char data[MAX_LENGTH];
+    memset(data, 0, MAX_LENGTH);
+    boost::system::error_code error;
+    socket.read_some(boost::asio::buffer(data), error);
+
+    if (error) {
+        std::cout << "Error reading request" << std::endl;
+    } else {
+        std::string message = handle_read(data);
+        boost::asio::write(socket, boost::asio::buffer(message, message.size()));
+    }
+    socket.close();
 }
 
 std::string Server::handle_read(const char* data) {

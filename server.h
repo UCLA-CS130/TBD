@@ -12,6 +12,7 @@ public:
 	Server(boost::asio::io_service& io_service, NginxConfig* config);
     virtual ~Server();
     void run();
+    void handle_request(boost::asio::ip::tcp::socket& socket);
     std::string handle_read(const char* data);
     void create_handler_map(NginxConfig* config);
     void init_status_counter();
