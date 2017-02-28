@@ -40,7 +40,7 @@ clean:
 	rm -f config_parser server *_test *.o *.a *.gcno *.gcda *.gcov
 
 server: server_main.o server.o config_parser.o echo_handler.o request_handler.o static_file_handler.o not_found_handler.o \
-		status_counter.o status_handler.o reverse_proxy_handler.o
+		status_counter.o status_handler.o reverse_proxy_handler.o redirect_handler.o
 	$(CXX) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
 config_parser: config_parser.cc config_parser_main.cc
@@ -107,6 +107,9 @@ status_handler_test : status_handler_test.o status_handler.o request_handler.o s
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
 status_counter_test : status_counter_test.o status_counter.o gmock_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
+
+redirect_handler_test : redirect_handler_test.o redirect_handler.o request_handler.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
 

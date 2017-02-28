@@ -88,6 +88,8 @@ std::string Response::build_status_line() {
         status_line += " 200 OK";
     } else if (status_code_ == ResponseCode::FILE_NOT_FOUND) {
         status_line += " 404 Not Found";
+    } else if (status_code_ == ResponseCode::FOUND) {
+        status_line += " 302 Found";
     }
 
     return status_line + "\r\n";
@@ -113,6 +115,8 @@ int Response::GetStatus() {
     switch(status_code_) {
     case OK:
         return 200;
+    case FOUND:
+        return 302;
     case FILE_NOT_FOUND:
         return 404;
     default:
