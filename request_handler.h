@@ -29,9 +29,8 @@ public:
 
     using Headers = std::vector<std::pair<std::string, std::string>>;
     Headers headers() const;
-private:
-    static std::vector<std::string> split_lines(std::string request);
 
+private:
     std::string raw_request_;
     std::string method_;
     std::string uri_;
@@ -57,10 +56,17 @@ public:
         FILE_NOT_FOUND = 404
     };
 
-    void SetStatus(const ResponseCode response_code);
+    static std::unique_ptr<Response> Parse(const std::string& raw_response);
+
+    void SetStatus(int response_code);
     void AddHeader(const std::string& header_name, const std::string& header_value);
     void SetBody(const std::string& body);
     int GetStatus();
+
+    std::string body() const;
+
+    using Headers = std::vector<std::pair<std::string, std::string>>;
+    Headers headers() const;
 
     std::string ToString();
 
@@ -69,9 +75,8 @@ private:
     std::string build_header_string(const std::pair<std::string, std::string>& field);
     
     std::string response_body_;
-    ResponseCode status_code_;
+    int status_code_;
     
-    using Headers = std::vector<std::pair<std::string, std::string>>;
     Headers headers_;
 };
 
