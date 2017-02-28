@@ -27,7 +27,8 @@ void Server::run() {
     while (true) {
         tcp::socket socket(io_service_);
         acceptor_.accept(socket);
-        handle_request(socket);
+        std::thread child([this, &socket] { this->handle_request(socket); });
+        child.join();
     }
 }
 
