@@ -17,7 +17,7 @@ path /status StatusHandler {
 }
 
 path /reverse_proxy ReverseProxyHandler {
-    remote_host www.boost.org/doc/libs/1_63_0/more/getting_started/index.html;
+    remote_host www.boost.org;
 }
 
 default NotFoundHandler {

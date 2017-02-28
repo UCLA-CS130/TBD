@@ -32,9 +32,13 @@ ReverseProxyHandler::Status ReverseProxyHandler::Init(const std::string& uri_pre
     }    
 
     if (remote_host_found) {
-        remote_uri_ = remote_host_.substr(remote_host_.find('/'));
-        
-        remote_host_ = remote_host_.substr(0, remote_host_.find('/'));
+        std::size_t slash_location = remote_host_.find('/'); // if slash exists
+        if (slash_location != std::string::npos) {
+            remote_uri_ = remote_host_.substr(remote_host_.find('/'));
+            remote_host_ = remote_host_.substr(0, remote_host_.find('/'));
+        } else {
+            remote_uri_ = "";
+        }   
         
         std::size_t port_location = remote_host_.find(':');
         if (port_location != std::string::npos) {
@@ -57,9 +61,8 @@ ReverseProxyHandler::Status ReverseProxyHandler::HandleRequest(const Request& re
     // TODO: Implement reverse proxy request
 
 
-
+    std::string request_uri = request.uri();
     boost::asio::io_service io_service;
-
     tcp::resolver resolver(io_service);
     tcp::resolver::query query(remote_host_, remote_port_);
     tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
@@ -76,7 +79,7 @@ ReverseProxyHandler::Status ReverseProxyHandler::HandleRequest(const Request& re
 
     std::cout << "Successfully connected!\n";
 
-    std::string request_string = std::string("GET ") + remote_uri_ +  " HTTP/1.1\r\n" +
+    std::string request_string = std::string("GET ") + remote_uri_ + request_uri.substr(uri_prefix_.size()) + " HTTP/1.1\r\n" +
                                  "Host: " + remote_host_ + ":" + remote_port_;
 
 
