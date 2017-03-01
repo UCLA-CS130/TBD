@@ -59,13 +59,30 @@ ReverseProxyHandler::Status ReverseProxyHandler::Init(const std::string& uri_pre
 
 ReverseProxyHandler::Status ReverseProxyHandler::HandleRequest(const Request& request, Response* response) {
     
+    using Headers = std::vector<std::pair<std::string, std::string>>;
 
     // copies made in case we need to handle a 302 and change which server we are talking to
     std::string remote_host = remote_host_;
     std::string remote_uri = remote_uri_;
     std::string remote_port = remote_port_;
     std::string request_uri = request.uri();
-    std::string request_uri_suffix = request_uri.substr(uri_prefix_.size());
+    std::string request_uri_suffix;
+
+    bool referer_flag = false;
+    Headers req_headers = request.headers();
+    for (std::size_t i = 0; i < req_headers.size(); i++) {
+        if(req_headers[i].first == "Referer") {
+            referer_flag  = true;
+            break;
+        }
+    }
+    // get rid of the prefix if referel header is not contained in request
+    if (!referer_flag) {
+        request_uri_suffix = request_uri.substr(uri_prefix_.size());
+    } else {
+        request_uri_suffix = request_uri;
+    }
+    
 
     response->SetStatus(Response::FOUND);
 
@@ -102,13 +119,26 @@ ReverseProxyHandler::Status ReverseProxyHandler::HandleRequest(const Request& re
         std::string request_string = std::string("GET ") + uri + " HTTP/1.1\r\n" +
                                      "Host: " + remote_host + ":" + remote_port;
 
+
+        std::string req_accept_string;
+        for (std::size_t i = 0; i < req_headers.size(); i++) {
+            if(req_headers[i].first == "Accept") {
+                req_accept_string = req_headers[i].second;
+                break;
+            }
+        }
+
+        std::string accept_string = "Accept: " + req_accept_string + "\r\n";
+
+
+
         request_string += std::string("\r\n") +
-                          "Accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8\r\n" +
+                          accept_string +
                           "Accept-Encoding: gzip, deflate, sdch\r\n" +
                           "Accept-Language: en-US,en;q=0.8\r\n" +
                           "\r\n";
                                
-                              
+                           
 
 
          // Send the response back to the client and then we're done
@@ -140,10 +170,9 @@ ReverseProxyHandler::Status ReverseProxyHandler::HandleRequest(const Request& re
             
         }
 
-        std::cout << "Got here!" << std::endl;
-        std::cout << "Remote response size: " << remote_response << std::endl;
+        //std::cout << "Remote response size: " << remote_response << std::endl;
         *response = *(Response::Parse(remote_response).get());
-        std::cout << "Got here too!" << std::endl;
+
 
         std::string content_length;
         using Headers = std::vector<std::pair<std::string, std::string>>;
@@ -151,7 +180,7 @@ ReverseProxyHandler::Status ReverseProxyHandler::HandleRequest(const Request& re
         for (std::size_t i = 0; i < headers.size(); i++) {
             std::cout << headers[i].first << ": " << headers[i].second << std::endl;
         }
-
+        // response->AddHeader("Content-Location", "localhost:12345/reverse_proxy/");
         
         std::cout << "Actual Content-Length: " << response->body().size() << std::endl;
 

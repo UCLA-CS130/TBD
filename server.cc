@@ -43,10 +43,35 @@ void Server::run() {
 }
 
 std::string Server::handle_read(const char* data) {
+    std::string longest_prefix;
     std::string data_string = std::string(data);
     auto request = Request::Parse(data_string);
     Response response;
-    std::string longest_prefix = find_uri_prefix(request->uri());
+
+
+    // check if request has a Referer field
+    using Headers = std::vector<std::pair<std::string, std::string>>;
+    Headers headers = request->headers();
+
+    std::string referer_url;
+    for (std::size_t i = 0; i < headers.size(); i++) {
+        if(headers[i].first == "Referer") {
+            referer_url = headers[i].second;
+        }
+    }
+    // if the field exists, we use that for longest prefix
+    if (referer_url != "") {
+        std::size_t slash_pos = referer_url.find('/');
+        slash_pos = referer_url.find('/', slash_pos+1);
+        slash_pos = referer_url.find('/', slash_pos+1); //find third slash
+        std::string referer_uri = referer_url.substr(slash_pos);
+        std::cout << "Referer url: " << referer_url << "\t" << "Referer uri: " << referer_uri << std::endl;
+        longest_prefix = find_uri_prefix(referer_uri);
+
+    } else {
+        longest_prefix = find_uri_prefix(request->uri());
+    } 
+    std::cout << "longest prefix: " << longest_prefix << std::endl;
     RequestHandler::Status status = handler_map_[longest_prefix]->HandleRequest(*request, &response);
 
     // update status counter
@@ -61,6 +86,7 @@ std::string Server::handle_read(const char* data) {
         if (handler_map_[longest_prefix]->GetName() != "NotFoundHandler")
             handler_map_["default"]->HandleRequest(*request, &response);
     }
+    std::cout << "Returning response" << std::endl;
 
     return response.ToString();
 }

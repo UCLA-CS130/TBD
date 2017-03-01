@@ -17,7 +17,7 @@ path /status StatusHandler {
 }
 
 path /reverse_proxy ReverseProxyHandler {
-    remote_host localhost:2020/redirect;
+    remote_host www.ucla.edu;
 }
 
 path /redirect RedirectHandler {

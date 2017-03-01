@@ -79,7 +79,7 @@ Headers Request::headers() const {
 // Response Implementations
 
 std::unique_ptr<Response> Response::Parse(const std::string& raw_response) {
-    std::cout << "Raw response: " << raw_response << std::endl;
+    // std::cout << "Raw response: " << raw_response << std::endl;
     std::unique_ptr<Response> new_response(new Response());
     std::vector<std::string> lines = split_lines(raw_response);
     std::cout << "Splitted lines" << std::endl;
@@ -112,7 +112,7 @@ std::unique_ptr<Response> Response::Parse(const std::string& raw_response) {
     i++;
     while (i < lines.size()) {
         new_response->response_body_ += lines[i];
-        if (i < lines.size()) {
+        if (i < lines.size()-1) {
             new_response->response_body_ += "\n"; // avoid putting new line at end
         } 
         i++;
