@@ -4,7 +4,7 @@
 
 // Helper Function(s)
 
-static std::vector<std::string> split_lines(std::string str) {
+static std::vector<std::string> split_lines(const std::string& str) {
     std::stringstream ss(str);
     std::string line;
     std::vector<std::string> lines;
