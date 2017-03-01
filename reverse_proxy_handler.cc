@@ -82,7 +82,8 @@ ReverseProxyHandler::Status ReverseProxyHandler::HandleRequest(const Request& re
     } else {
         request_uri_suffix = request_uri;
     }
-    
+
+    std::cout << "Request uri suffix:" << request_uri_suffix << std::endl;
 
     response->SetStatus(Response::FOUND);
 

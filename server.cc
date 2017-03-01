@@ -54,10 +54,12 @@ std::string Server::handle_read(const char* data) {
     Headers headers = request->headers();
 
     std::string referer_url;
+    std::cout << "\nRequest:" << request->uri() << "; headers:" << std::endl;
     for (std::size_t i = 0; i < headers.size(); i++) {
         if(headers[i].first == "Referer") {
             referer_url = headers[i].second;
         }
+        std::cout << "\t" << headers[i].first << ": " << headers[i].second << std::endl;
     }
     // if the field exists, we use that for longest prefix
     if (referer_url != "") {
@@ -67,6 +69,20 @@ std::string Server::handle_read(const char* data) {
         std::string referer_uri = referer_url.substr(slash_pos);
         std::cout << "Referer url: " << referer_url << "\t" << "Referer uri: " << referer_uri << std::endl;
         longest_prefix = find_uri_prefix(referer_uri);
+        if (longest_prefix == "default") {//if its referring of a reference, won't have a prefix, try every single one?
+            for ( auto it = handler_map_.begin(); it != handler_map_.end(); it++ ) {
+                if (it->second->GetName() == "ReverseProxyHandler") {
+                    std::cout << "Trying a reverseproxyhanlder!" << std::endl;
+                    RequestHandler::Status status1 = it->second->HandleRequest(*request, &response);
+
+                    if (status1  == RequestHandler::OK ) {
+                        std::cout << "Got a good response!!" << std::endl;
+                        return response.ToString();
+                    }
+                }
+            }
+        }
+
 
     } else {
         longest_prefix = find_uri_prefix(request->uri());
