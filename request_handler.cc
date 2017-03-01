@@ -153,7 +153,7 @@ void Response::AddHeader(const std::string& header_name, const std::string& head
     headers_.push_back(std::make_pair(header_name, header_value));
 }
 
-int Response::GetStatus() {
+int Response::GetStatus() const {
     return status_code_;
 }
 
