@@ -62,7 +62,7 @@ public:
     void SetStatus(int response_code);
     void AddHeader(const std::string& header_name, const std::string& header_value);
     void SetBody(const std::string& body);
-    int GetStatus();
+    int GetStatus() const;
 
     std::string body() const;
 
