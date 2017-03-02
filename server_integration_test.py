@@ -84,12 +84,27 @@ if static404_response != expected_static404_response:
 else:
     print("SUCCESS: Static handler replied with the correct response for a 404 request.")
 
+# Redirect handler test
+# Check if a simple redirect request to an echo request response matches with
+# a normal, actual echo request response
+run_server_command2 = ["./server", "path_config2"]
+server_proc2 = subprocess.Popen(run_server_command2, stdout=subprocess.PIPE)
+redirect_request_command = "curl -i -s localhost:8081/redirect"
+redirect_request_proc = subprocess.Popen(redirect_request_command, stdout=subprocess.PIPE, shell=True)
+redirect_response = redirect_request_proc.stdout.read().decode('utf-8')
+
+expected_redirect_response = "HTTP/1.1 302 Found\r\nLocation: http://localhost:8081/echo\r\n\r\n"
+
+if redirect_response != expected_redirect_response:
+    print("ERROR: Redirect handler replied with an incorrect response for redirect/")
+    test_failed = True;
+else:
+    print("SUCCESS: Redirect handler replied with the correct response for redirect/")
+
 # Reverse Proxy handler test
 # Run two instances of the web server, with one configured as a proxy
 # Make a request to the proxy, which then directs to the backend server
 # The response should be the same as backend being requested from directly
-run_server_command2 = ["./server", "path_config2"]
-server_proc2 = subprocess.Popen(run_server_command2, stdout=subprocess.PIPE)
 proxy_request_command = "curl -i -s localhost:8080/simple_proxy/static/index.html"
 proxy_request_proc = subprocess.Popen(proxy_request_command, stdout=subprocess.PIPE, shell=True)
 proxy_response = proxy_request_proc.stdout.read().decode('utf-8')
