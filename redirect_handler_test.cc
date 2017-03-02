@@ -20,7 +20,6 @@ TEST_F(RedirectHandlerTest, GetNameCheck) {
     EXPECT_EQ("RedirectHandler", GetName());
 }
 
-TEST_F(RedirectHandlerTest, HandlRedirect) {
-    EXPECT_EQ("HTTP/1.1 302 Found\r\nLocation: \r\n\r\n",
-            HandleRequest());
+TEST_F(RedirectHandlerTest, HandleRedirect) {
+    EXPECT_EQ("HTTP/1.1 302 Found\r\nLocation: \r\n\r\n", HandleRequest());
 }

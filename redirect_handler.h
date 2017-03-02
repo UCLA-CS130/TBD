@@ -13,7 +13,6 @@ public:
 
 private:
     std::string url_; // url that the server will redirect the user to
-
 };
 
 REGISTER_REQUEST_HANDLER(RedirectHandler);

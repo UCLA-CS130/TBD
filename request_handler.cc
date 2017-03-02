@@ -4,19 +4,14 @@
 
 // Helper Function(s)
 
-static std::vector<std::string> split_lines(std::string str) {
+static std::vector<std::string> split_lines(const std::string& str) {
     std::stringstream ss(str);
     std::string line;
     std::vector<std::string> lines;
 
     // tokenize each line by newline
-    while(std::getline(ss,line,'\n')) {
-        // remove carriage return from line
-        if (line[line.size()-1] == '\r') {
-            lines.push_back(line.substr(0, line.size()-1));
-        } else {
-            lines.push_back(line.substr(0, line.size()));
-        }
+    while (std::getline(ss, line, '\n')) {
+        lines.push_back(line);
     }
     return lines;
 }
@@ -30,6 +25,11 @@ std::unique_ptr<Request> Request::Parse(const std::string & raw_request) {
     
     std::vector<std::string> lines = split_lines(raw_request);
     for (size_t i = 0; i < lines.size(); i++) {
+        // remove carriage return from line
+        if (lines[i][lines[i].size()-1] == '\r') {
+            lines[i] = lines[i].substr(0, lines[i].size()-1);
+        }
+
         if (i == 0) {
         // parse first line of the request
             auto first_space = lines[i].find(" ");
@@ -79,10 +79,8 @@ Headers Request::headers() const {
 // Response Implementations
 
 std::unique_ptr<Response> Response::Parse(const std::string& raw_response) {
-    // std::cout << "Raw response: " << raw_response << std::endl;
     std::unique_ptr<Response> new_response(new Response());
     std::vector<std::string> lines = split_lines(raw_response);
-    // std::cout << "Splitted lines" << std::endl;
 
     // parse first line of the response
     if (lines.size() > 0) {
@@ -96,29 +94,37 @@ std::unique_ptr<Response> Response::Parse(const std::string& raw_response) {
             return std::unique_ptr<Response>();
         }
     }
-    // std::cout << "Parsed first line" << std::endl;
+
     // parse header fields of the response
     unsigned int i = 1;
-    while (i < lines.size() && !lines[i].empty()) {
+    while (i < lines.size() && lines[i].size() > 1) {
+        // remove carriage return from line
+        if (lines[i][lines[i].size()-1] == '\r') {
+            lines[i] = lines[i].substr(0, lines[i].size()-1);
+        }
+
         auto first_space = lines[i].find(" ");
         std::string field = lines[i].substr(0, first_space - 1);
         std::string value = lines[i].substr(first_space + 1);
         new_response->headers_.push_back(std::make_pair(field, value));
         i++;
     }
-    // std::cout << "Parsed header fields" << std::endl;
 
     // parse body of the response
     i++;
     while (i < lines.size()) {
         new_response->response_body_ += lines[i];
         if (i < lines.size()-1) {
-            new_response->response_body_ += "\n"; // avoid putting new line at end
+            new_response->response_body_ += "\n";
         } 
         i++;
     }
-    
-    // std::cout << "Returning new response!" << std::endl;
+
+    // the last line may or may not have a newline
+    if (raw_response[raw_response.size()-1] == '\n') {
+        new_response->response_body_ += "\n";
+    }
+
     return new_response;
 }
 
@@ -137,8 +143,7 @@ std::string Response::build_status_line() {
         status_line += " 200 OK";
     } else if (status_code_ == ResponseCode::FILE_NOT_FOUND) {
         status_line += " 404 Not Found";
-
-    } else if (status_code_ == ResponseCode::FOUND) {
+    } else if (status_code_ == ResponseCode::REDIRECT) {
         status_line += " 302 Found";
     } else {
         status_line += " " + std::to_string(status_code_) + " Proxy";
@@ -163,7 +168,7 @@ void Response::AddHeader(const std::string& header_name, const std::string& head
     headers_.push_back(std::make_pair(header_name, header_value));
 }
 
-int Response::GetStatus() {
+int Response::GetStatus() const {
     return status_code_;
 }
 

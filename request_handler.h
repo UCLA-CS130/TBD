@@ -53,7 +53,7 @@ class Response {
 public:
     enum ResponseCode {
         OK = 200,
-        FOUND = 302,
+        REDIRECT = 302,
         FILE_NOT_FOUND = 404
     };
 
@@ -62,7 +62,7 @@ public:
     void SetStatus(int response_code);
     void AddHeader(const std::string& header_name, const std::string& header_value);
     void SetBody(const std::string& body);
-    int GetStatus();
+    int GetStatus() const;
 
     std::string body() const;
 
@@ -90,7 +90,6 @@ class RequestHandler {
 
   enum Status {
     OK = 0,
-    FOUND = 302,
     FILE_NOT_FOUND = 404,
     INTERNAL_ERROR = 500
   };
