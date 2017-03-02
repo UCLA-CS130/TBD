@@ -91,7 +91,7 @@ echo_handler_test : echo_handler_test.o echo_handler.o request_handler.o gmock_m
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
 server_test : config_parser.o server.o server_test.o request_handler.o echo_handler.o  static_file_handler.o \
-				 status_counter.o status_handler.o not_found_handler.o gmock_main.a
+				 status_counter.o status_handler.o not_found_handler.o gmock_main.a reverse_proxy_handler.o redirect_handler.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
 config_parser_test : config_parser.o config_parser_test.o gtest_main.a
