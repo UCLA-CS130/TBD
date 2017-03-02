@@ -53,7 +53,7 @@ class Response {
 public:
     enum ResponseCode {
         OK = 200,
-        FOUND = 302,
+        REDIRECT = 302,
         FILE_NOT_FOUND = 404
     };
 
@@ -90,7 +90,7 @@ class RequestHandler {
 
   enum Status {
     OK = 0,
-    FOUND = 302,
+    REDIRECT = 302,
     FILE_NOT_FOUND = 404,
     INTERNAL_ERROR = 500
   };

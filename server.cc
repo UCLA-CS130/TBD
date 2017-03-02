@@ -32,9 +32,7 @@ void Server::run() {
         boost::system::error_code error;
         socket.read_some(boost::asio::buffer(data), error);
 
-        if (error) {
-            std::cout << "Error reading request" << std::endl;
-        } else {
+        if (!error) {
             std::string message = handle_read(data);
             boost::asio::write(socket, boost::asio::buffer(message, message.size()));
         }
@@ -43,51 +41,42 @@ void Server::run() {
 }
 
 std::string Server::handle_read(const char* data) {
-    std::string longest_prefix;
     std::string data_string = std::string(data);
     auto request = Request::Parse(data_string);
     Response response;
+    std::string longest_prefix;
 
-
-    // check if request has a Referer field
+    // check if request has a referer field
     using Headers = std::vector<std::pair<std::string, std::string>>;
     Headers headers = request->headers();
-
     std::string referer_url;
-    std::cout << "\nRequest:" << request->uri() << "; headers:" << std::endl;
     for (std::size_t i = 0; i < headers.size(); i++) {
-        if(headers[i].first == "Referer") {
+        if (headers[i].first == "Referer") {
             referer_url = headers[i].second;
         }
-        std::cout << "\t" << headers[i].first << ": " << headers[i].second << std::endl;
     }
-    // if the field exists, we use that for longest prefix
+
+    // if the referer field exists, we use that for longest prefix
     if (referer_url != "") {
         std::size_t slash_pos = referer_url.find('/');
         slash_pos = referer_url.find('/', slash_pos+1);
-        slash_pos = referer_url.find('/', slash_pos+1); //find third slash
+        slash_pos = referer_url.find('/', slash_pos+1); // find third slash
         std::string referer_uri = referer_url.substr(slash_pos);
-        std::cout << "Referer url: " << referer_url << "\t" << "Referer uri: " << referer_uri << std::endl;
         longest_prefix = find_uri_prefix(referer_uri);
-        if (longest_prefix == "default") {//if its referring of a reference, won't have a prefix, try every single one?
-            for ( auto it = handler_map_.begin(); it != handler_map_.end(); it++ ) {
+        if (longest_prefix == "default") {
+            for (auto it = handler_map_.begin(); it != handler_map_.end(); it++) {
                 if (it->second->GetName() == "ReverseProxyHandler") {
-                    std::cout << "Trying a reverseproxyhanlder!" << std::endl;
-                    RequestHandler::Status status1 = it->second->HandleRequest(*request, &response);
-
-                    if (status1  == RequestHandler::OK ) {
-                        std::cout << "Got a good response!!" << std::endl;
+                    RequestHandler::Status status = it->second->HandleRequest(*request, &response);
+                    if (status == RequestHandler::OK) {
                         return response.ToString();
                     }
                 }
             }
+            longest_prefix = find_uri_prefix(request->uri());
         }
-
-
     } else {
         longest_prefix = find_uri_prefix(request->uri());
-    } 
-    std::cout << "longest prefix: " << longest_prefix << std::endl;
+    }
     RequestHandler::Status status = handler_map_[longest_prefix]->HandleRequest(*request, &response);
 
     // update status counter
@@ -102,7 +91,6 @@ std::string Server::handle_read(const char* data) {
         if (handler_map_[longest_prefix]->GetName() != "NotFoundHandler")
             handler_map_["default"]->HandleRequest(*request, &response);
     }
-    std::cout << "Returning response" << std::endl;
 
     return response.ToString();
 }
