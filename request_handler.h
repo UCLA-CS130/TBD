@@ -90,7 +90,6 @@ class RequestHandler {
 
   enum Status {
     OK = 0,
-    REDIRECT = 302,
     FILE_NOT_FOUND = 404,
     INTERNAL_ERROR = 500
   };

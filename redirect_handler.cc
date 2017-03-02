@@ -25,9 +25,9 @@ RedirectHandler::Status RedirectHandler::Init(const std::string& uri_prefix, con
 
 RedirectHandler::Status RedirectHandler::HandleRequest(const Request& request, Response* response) {
     (void) request;
-    response->SetStatus(Response::ResponseCode::FOUND);
+    response->SetStatus(Response::ResponseCode::REDIRECT);
     response->AddHeader("Location", url_);
-    return FOUND;
+    return OK;
 }
 
 std::string RedirectHandler::GetName() {
