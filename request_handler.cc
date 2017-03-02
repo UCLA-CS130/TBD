@@ -4,7 +4,7 @@
 
 // Helper Function(s)
 
-static std::vector<std::string> split_lines(std::string str) {
+static std::vector<std::string> split_lines(const std::string& str) {
     std::stringstream ss(str);
     std::string line;
     std::vector<std::string> lines;
@@ -168,7 +168,7 @@ void Response::AddHeader(const std::string& header_name, const std::string& head
     headers_.push_back(std::make_pair(header_name, header_value));
 }
 
-int Response::GetStatus() {
+int Response::GetStatus() const {
     return status_code_;
 }
 
