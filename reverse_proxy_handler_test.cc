@@ -4,7 +4,6 @@
 #include "config_parser.h"
 #include "reverse_proxy_handler.h"
 
-
 class ReverseProxyHandlerTest : public ::testing::Test {
 protected:
     bool Init() {
@@ -37,7 +36,6 @@ protected:
         auto request = Request::Parse(raw_request);
         Response response;
         reverse_proxy_handler_.HandleRequest(*request, &response);
-        std::cout << response.ToString() << std::endl;
         return response.ToString();
     }
     NginxConfig config_;
@@ -50,13 +48,8 @@ TEST_F(ReverseProxyHandlerTest, GetNameCheck) {
 
 TEST_F(ReverseProxyHandlerTest, ValidProxyRequest) {
     // Run separate webserver to send requests to from reverse proxy
-    //std::system("./server path_config2");
+    std::system("./server path_config2 &");
     ASSERT_TRUE(Init());
-    //EXPECT_EQ("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nGET /echo HTTP/1.1", HandleRequest("GET /simple_proxy/echo HTTP/1.1"));
-}
-
-TEST_F(ReverseProxyHandlerTest, RedirectProxyRequest) {
-    ASSERT_TRUE(Init());
-    //EXPECT_EQ("HTTP/1.1 302 Found\r\nLocation: http://localhost:8081/echo\r\n\r\n", HandleRequest("GET /simple_proxy/redirect HTTP/1.1"));
+    EXPECT_EQ("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nGET /echo HTTP/1.1\r\nHost: localhost: 8081\r\n\r\n", HandleRequest("GET /simple_proxy/echo HTTP/1.1"));
 }
 
