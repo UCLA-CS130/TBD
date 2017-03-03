@@ -4,10 +4,6 @@ import signal
 import socket
 import time
 
-# Build server binary if it doesnt already exist
-if not os.path.exists("server"):
-    subprocess.check_call("make server", stdout=subprocess.PIPE, shell=True)
-
 # Spawn a shell process to run the server
 run_server_command = ["./server", "path_config"]
 server_proc = subprocess.Popen(run_server_command, stdout=subprocess.PIPE)

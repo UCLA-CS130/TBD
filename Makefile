@@ -130,4 +130,6 @@ coverage : test
 	gcov -r not_found_handler.cc; gcov -r status_counter.cc;
 
 integration : 
-	python server_integration_test.py
+	make clean && make;
+	python server_integration_test.py;
+	python multithreading_test.py;
