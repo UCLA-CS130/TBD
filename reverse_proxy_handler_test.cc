@@ -46,17 +46,7 @@ TEST_F(ReverseProxyHandlerTest, GetNameCheck) {
     EXPECT_EQ("ReverseProxyHandler", GetName());
 }
 
-TEST_F(ReverseProxyHandlerTest, ValidProxyRequest) {
-    // Run separate webserver to send requests to from reverse proxy
-    std::system("./server path_config2 &");
-    ASSERT_TRUE(Init());
-    EXPECT_EQ("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nGET /echo HTTP/1.1\r\nHost: localhost: 8081\r\n\r\n", HandleRequest("GET /simple_proxy/echo HTTP/1.1"));
+TEST_F(ReverseProxyHandlerTest, InitProxy) {
+    EXPECT_TRUE(Init());   
 }
-
-/*
-TEST_F(ReverseProxyHandlerTest, RedirectProxyRequest) {
-    ASSERT_TRUE(Init());
-    EXPECT_EQ("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nGET /simple_proxy/redirect\r\nHost: localhost: 8081\r\n\r\n", HandleRequest("GET /simple_proxy/redirect HTTP/1.1\r\n\r\n"));
-}
-*/
 
