@@ -1,0 +1,18 @@
+port 8081;
+
+path /static StaticFileHandler {
+    root .;
+}
+
+path /echo EchoHandler {
+    root .;
+}
+
+path /redirect RedirectHandler {
+    url http://localhost:8081/echo;
+}
+
+default NotFoundHandler {
+    root .;
+}
+

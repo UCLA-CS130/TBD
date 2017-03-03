@@ -52,7 +52,39 @@ std::string Server::handle_read(const char* data) {
     std::string data_string = std::string(data);
     auto request = Request::Parse(data_string);
     Response response;
-    std::string longest_prefix = find_uri_prefix(request->uri());
+    std::string longest_prefix;
+
+    // check if request has a referer field
+    using Headers = std::vector<std::pair<std::string, std::string>>;
+    Headers headers = request->headers();
+    std::string referer_url;
+    for (std::size_t i = 0; i < headers.size(); i++) {
+        if (headers[i].first == "Referer") {
+            referer_url = headers[i].second;
+        }
+    }
+
+    // if the referer field exists, we use that for longest prefix
+    if (referer_url != "") {
+        std::size_t slash_pos = referer_url.find('/');
+        slash_pos = referer_url.find('/', slash_pos+1);
+        slash_pos = referer_url.find('/', slash_pos+1); // find third slash
+        std::string referer_uri = referer_url.substr(slash_pos);
+        longest_prefix = find_uri_prefix(referer_uri);
+        if (longest_prefix == "default") {
+            for (auto it = handler_map_.begin(); it != handler_map_.end(); it++) {
+                if (it->second->GetName() == "ReverseProxyHandler") {
+                    RequestHandler::Status status = it->second->HandleRequest(*request, &response);
+                    if (status == RequestHandler::OK) {
+                        return response.ToString();
+                    }
+                }
+            }
+            longest_prefix = find_uri_prefix(request->uri());
+        }
+    } else {
+        longest_prefix = find_uri_prefix(request->uri());
+    }
     RequestHandler::Status status = handler_map_[longest_prefix]->HandleRequest(*request, &response);
 
     // update status counter

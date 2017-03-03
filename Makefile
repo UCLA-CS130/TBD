@@ -40,7 +40,7 @@ clean:
 	rm -f config_parser server *_test *.o *.a *.gcno *.gcda *.gcov
 
 server: server_main.o server.o config_parser.o echo_handler.o request_handler.o static_file_handler.o not_found_handler.o \
-		status_counter.o status_handler.o reverse_proxy_handler.o
+		status_counter.o status_handler.o reverse_proxy_handler.o redirect_handler.o
 	$(CXX) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
 config_parser: config_parser.cc config_parser_main.cc
@@ -91,7 +91,7 @@ echo_handler_test : echo_handler_test.o echo_handler.o request_handler.o gmock_m
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
 server_test : config_parser.o server.o server_test.o request_handler.o echo_handler.o  static_file_handler.o \
-				 status_counter.o status_handler.o not_found_handler.o gmock_main.a
+				 status_counter.o status_handler.o not_found_handler.o gmock_main.a reverse_proxy_handler.o redirect_handler.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
 config_parser_test : config_parser.o config_parser_test.o gtest_main.a
@@ -109,10 +109,16 @@ status_handler_test : status_handler_test.o status_handler.o request_handler.o s
 status_counter_test : status_counter_test.o status_counter.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
+redirect_handler_test : redirect_handler_test.o redirect_handler.o request_handler.o gmock_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
+
+reverse_proxy_handler_test : reverse_proxy_handler_test.o reverse_proxy_handler.o request_handler.o config_parser.o gmock_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
 TESTS = config_parser_test server_test echo_handler_test \
 		request_handler_test static_file_handler_test \
-		not_found_handler_test status_handler_test
+		not_found_handler_test status_handler_test \
+		redirect_handler_test reverse_proxy_handler_test
 test : $(TESTS)
 	for t in $^ ; do ./$$t ; done
 

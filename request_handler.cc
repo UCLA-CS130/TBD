@@ -10,13 +10,8 @@ static std::vector<std::string> split_lines(const std::string& str) {
     std::vector<std::string> lines;
 
     // tokenize each line by newline
-    while(std::getline(ss,line,'\n')) {
-        // remove carriage return from line
-        if (line[line.size()-1] == '\r') {
-            lines.push_back(line.substr(0, line.size()-1));
-        } else {
-            lines.push_back(line.substr(0, line.size()));
-        }
+    while (std::getline(ss, line, '\n')) {
+        lines.push_back(line);
     }
     return lines;
 }
@@ -30,6 +25,11 @@ std::unique_ptr<Request> Request::Parse(const std::string & raw_request) {
     
     std::vector<std::string> lines = split_lines(raw_request);
     for (size_t i = 0; i < lines.size(); i++) {
+        // remove carriage return from line
+        if (lines[i][lines[i].size()-1] == '\r') {
+            lines[i] = lines[i].substr(0, lines[i].size()-1);
+        }
+
         if (i == 0) {
         // parse first line of the request
             auto first_space = lines[i].find(" ");
@@ -97,7 +97,12 @@ std::unique_ptr<Response> Response::Parse(const std::string& raw_response) {
 
     // parse header fields of the response
     unsigned int i = 1;
-    while (i < lines.size() && !lines[i].empty()) {
+    while (i < lines.size() && lines[i].size() > 1) {
+        // remove carriage return from line
+        if (lines[i][lines[i].size()-1] == '\r') {
+            lines[i] = lines[i].substr(0, lines[i].size()-1);
+        }
+
         auto first_space = lines[i].find(" ");
         std::string field = lines[i].substr(0, first_space - 1);
         std::string value = lines[i].substr(first_space + 1);
@@ -108,8 +113,16 @@ std::unique_ptr<Response> Response::Parse(const std::string& raw_response) {
     // parse body of the response
     i++;
     while (i < lines.size()) {
-        new_response->response_body_ += lines[i] + "\r\n";
+        new_response->response_body_ += lines[i];
+        if (i < lines.size()-1) {
+            new_response->response_body_ += "\n";
+        } 
         i++;
+    }
+
+    // the last line may or may not have a newline
+    if (raw_response[raw_response.size()-1] == '\n') {
+        new_response->response_body_ += "\n";
     }
 
     return new_response;
@@ -130,6 +143,8 @@ std::string Response::build_status_line() {
         status_line += " 200 OK";
     } else if (status_code_ == ResponseCode::FILE_NOT_FOUND) {
         status_line += " 404 Not Found";
+    } else if (status_code_ == ResponseCode::REDIRECT) {
+        status_line += " 302 Found";
     } else {
         status_line += " " + std::to_string(status_code_) + " Proxy";
     }

@@ -53,6 +53,7 @@ class Response {
 public:
     enum ResponseCode {
         OK = 200,
+        REDIRECT = 302,
         FILE_NOT_FOUND = 404
     };
 
