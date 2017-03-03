@@ -1,5 +1,4 @@
 #include "reverse_proxy_handler.h"
-
 #include <iostream>
 #include <string>
 #include <boost/array.hpp>
@@ -122,7 +121,7 @@ ReverseProxyHandler::Status ReverseProxyHandler::HandleRequest(const Request& re
             }
             remote_response += std::string(buf.data(), len);
         }
-
+        
         // parse the remote response into the actual response data structure
         *response = *(Response::Parse(remote_response).get());
 
@@ -157,10 +156,15 @@ ReverseProxyHandler::Status ReverseProxyHandler::HandleRequest(const Request& re
             if (port_location != std::string::npos) {
                 remote_port = remote_host.substr(port_location+1);
                 remote_host = remote_host.substr(0, port_location);
+                std::size_t uri_location = remote_port.find("/");
+                if (uri_location != std::string::npos) {
+                    remote_uri = remote_port.substr(uri_location);
+                    remote_port = remote_port.substr(0, uri_location);
+                }
             } else {
                 remote_port = "80"; // default port number
             }
-
+            
             // All these status responses redirect
             response->SetStatus(Response::REDIRECT);
         }

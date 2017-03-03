@@ -20,6 +20,10 @@ path /simple_proxy ReverseProxyHandler {
     remote_host localhost:8081;
 }
 
+path /redirect_proxy ReverseProxyHandler {
+    remote_host localhost:8081/redirect;
+}
+
 path /reverse_proxy ReverseProxyHandler {
     remote_host www.ucla.edu;
 }

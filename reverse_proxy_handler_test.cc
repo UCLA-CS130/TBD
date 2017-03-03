@@ -53,3 +53,10 @@ TEST_F(ReverseProxyHandlerTest, ValidProxyRequest) {
     EXPECT_EQ("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nGET /echo HTTP/1.1\r\nHost: localhost: 8081\r\n\r\n", HandleRequest("GET /simple_proxy/echo HTTP/1.1"));
 }
 
+/*
+TEST_F(ReverseProxyHandlerTest, RedirectProxyRequest) {
+    ASSERT_TRUE(Init());
+    EXPECT_EQ("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nGET /simple_proxy/redirect\r\nHost: localhost: 8081\r\n\r\n", HandleRequest("GET /simple_proxy/redirect HTTP/1.1\r\n\r\n"));
+}
+*/
+

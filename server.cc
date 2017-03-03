@@ -31,7 +31,7 @@ void Server::run() {
         memset(data, 0, MAX_LENGTH);
         boost::system::error_code error;
         socket.read_some(boost::asio::buffer(data), error);
-
+        
         if (!error) {
             std::string message = handle_read(data);
             boost::asio::write(socket, boost::asio::buffer(message, message.size()));

@@ -111,16 +111,38 @@ proxy_response = proxy_request_proc.stdout.read().decode('utf-8')
 backend_request_command = "curl -i -s localhost:8081/static/index.html"
 backend_request_proc = subprocess.Popen(backend_request_command, stdout=subprocess.PIPE, shell=True)
 backend_response = backend_request_proc.stdout.read().decode('utf-8')
-server_proc2.terminate()
 
 if proxy_response != backend_response:
     print("ERROR: Proxy handler replied with an incorrect response for simple_proxy/")
     test_failed = True;
 else:
     print("SUCCESS: Proxy handler replied with the correct response for simple_proxy/")
+    
+# Reverse Proxy Redirect test
+# Run two instances of the web server, with one configured as a proxy
+# Make a request to the proxy, which is a redirect to echo request
+# The response should be the same as backend being requested from directly
+proxy_redirect_request_command = "curl -i -s localhost:8080/redirect_proxy/"
+proxy_redirect_request_proc = subprocess.Popen(proxy_redirect_request_command, stdout=subprocess.PIPE, shell=True)
+proxy_redirect_response = proxy_redirect_request_proc.stdout.read().decode('utf-8')
+
+expected_proxy_redirect_response = """HTTP/1.1 200 OK\r
+Content-Type: text/plain\r
+\r
+GET /echo/ HTTP/1.1\r
+Host: localhost: 8081\r
+User-Agent: curl/7.35.0\r
+Accept: */*\r\n\r\n"""
+
+if proxy_redirect_response != expected_proxy_redirect_response:
+    print("ERROR: Proxy handler replied with an incorrect response for redirect_proxy/")
+    test_failed = True;
+else:
+    print("SUCCESS: Proxy handler replied with the correct response for redirect_proxy/")
 
 # Terminate server process before exiting
 server_proc.terminate()
+server_proc2.terminate()
 
 if test_failed:
 	print("At least one test case failed -> exiting with exit code 1")
