@@ -14,7 +14,7 @@ GMOCK_DIR=googletest/googlemock
 CPPFLAGS += -isystem $(GTEST_DIR)/include -isystem $(GMOCK_DIR)/include
 
 # Flags passed to the C++ compiler.
-CXXFLAGS += -g -Wall -Wextra -Werror -pthread -std=c++0x
+CXXFLAGS += -g -Wall -Wextra -Werror -static-libgcc -static-libstdc++ -pthread -Wl,-Bstatic -std=c++0x
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -34,10 +34,16 @@ GTEST_SRCS_ = $(GTEST_DIR)/src/*.cc $(GTEST_DIR)/src/*.h $(GTEST_HEADERS)
 GMOCK_SRCS_ = $(GMOCK_DIR)/src/*.cc $(GMOCK_HEADERS)
 
 
+.PHONY: clean deploy
+
 all: server
 
 clean:
 	rm -f config_parser server *_test *.o *.a *.gcno *.gcda *.gcov
+
+deploy:
+	docker build -t httpserver.build -f Dockerfile.build . ; \
+	docker run --rm httpserver.build | docker build -t httpserver -f deploy/Dockerfile.run deploy/
 
 server: server_main.o server.o config_parser.o echo_handler.o request_handler.o static_file_handler.o not_found_handler.o \
 		status_counter.o status_handler.o reverse_proxy_handler.o redirect_handler.o
