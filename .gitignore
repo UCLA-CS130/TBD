@@ -8,3 +8,6 @@ server
 *.gcno
 *.gcov
 *.dSYM/
+
+*.csr
+*.pem

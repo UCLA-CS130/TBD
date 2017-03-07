@@ -14,7 +14,7 @@ GMOCK_DIR=googletest/googlemock
 CPPFLAGS += -isystem $(GTEST_DIR)/include -isystem $(GMOCK_DIR)/include
 
 # Flags passed to the C++ compiler.
-CXXFLAGS += -g -Wall -Wextra -Werror -pthread -std=c++0x
+CXXFLAGS += -g -Wall -Wextra -Werror -pthread -std=c++0x -L/usr/local/ssl/lib -lssl -lcrypto
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -41,7 +41,7 @@ clean:
 
 server: server_main.o server.o config_parser.o echo_handler.o request_handler.o static_file_handler.o not_found_handler.o \
 		status_counter.o status_handler.o reverse_proxy_handler.o redirect_handler.o
-	$(CXX) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
+	$(CXX) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system -lcrypto -lssl
 
 config_parser: config_parser.cc config_parser_main.cc
 	g++ config_parser.cc config_parser_main.cc -std=c++0x -g -Wall -o config_parser

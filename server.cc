@@ -10,6 +10,7 @@
 #include <thread>
 #include "server.h"
 #include "status_counter.h"
+#include <boost/bind.hpp>
 
 using boost::asio::ip::tcp;
 
@@ -25,26 +26,44 @@ Server::~Server() {}
 // Start accepting requests
 void Server::run() {
     while (true) {
-        tcp::socket* socket = new tcp::socket(io_service_);
-        acceptor_.accept(*socket);
+        boost::asio::ssl::context context(boost::asio::ssl::context::sslv23);
+        context.set_options(boost::asio::ssl::context::default_workarounds
+        | boost::asio::ssl::context::no_sslv2
+        | boost::asio::ssl::context::single_dh_use);
+        context.set_password_callback(boost::bind(&Server::get_password, this));
+        context.use_certificate_chain_file("newcert.pem");
+        context.use_private_key_file("privkey.pem", boost::asio::ssl::context::pem);
+
+        boost::asio::ssl::stream<tcp::socket>* socket = new boost::asio::ssl::stream<tcp::socket>(io_service_, context);
+        acceptor_.accept(socket->lowest_layer());
         std::thread child([this, socket] { this->handle_request(socket); });
         child.detach();
     }
 }
 
-void Server::handle_request(tcp::socket* socket) {
+std::string Server::get_password() const {
+    std::cout << "in password callback!" << std::endl;
+    return "cs130";
+}
+
+void Server::handle_request(boost::asio::ssl::stream<tcp::socket>* socket) {
+    boost::system::error_code error;
+    boost::system::error_code returned_error;
+    socket->handshake(boost::asio::ssl::stream_base::server, error);
+    std::cout << "handshake msg: " << returned_error.message() << std::endl;
     char data[MAX_LENGTH];
     memset(data, 0, MAX_LENGTH);
-    boost::system::error_code error;
-    socket->read_some(boost::asio::buffer(data), error);
+    boost::system::error_code read_error;
+    socket->read_some(boost::asio::buffer(data), read_error);
 
-    if (error) {
+    if (read_error) {
         std::cout << "Error reading request" << std::endl;
     } else {
         std::string message = handle_read(data);
         boost::asio::write(*socket, boost::asio::buffer(message, message.size()));
     }
-    socket->close();
+    // TODO: figure out how to close new 'socket'
+    //socket->close();
     delete socket;
 }
 
