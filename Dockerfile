@@ -8,5 +8,6 @@ RUN apt-get install -y g++
 WORKDIR /opt/webserver
 COPY . /opt/webserver
 
-RUN make clean && make server
+RUN make clean && make
+
 CMD tar -cf - server

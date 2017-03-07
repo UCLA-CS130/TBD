@@ -42,8 +42,9 @@ clean:
 	rm -f config_parser server *_test *.o *.a *.gcno *.gcda *.gcov
 
 deploy:
-	docker build -t httpserver.build -f Dockerfile.build . ; \
-	docker run --rm httpserver.build | docker build -t httpserver -f deploy/Dockerfile.run deploy/
+	docker build -t httpserver.build . ; \
+	docker run httpserver.build > ./deploy/binary.tar; tar -xvf ./deploy/binary.tar -C ./deploy; \
+	docker build -t httpserver -f deploy/Dockerfile.run ./deploy; rm -f ./deploy/binary.tar
 
 server: server_main.o server.o config_parser.o echo_handler.o request_handler.o static_file_handler.o not_found_handler.o \
 		status_counter.o status_handler.o reverse_proxy_handler.o redirect_handler.o

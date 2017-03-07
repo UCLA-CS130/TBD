@@ -4,7 +4,11 @@ path /foo EchoHandler {
     root .;
 }
 
-path /static StaticFileHandler {
+path /static1 StaticFileHandler {
+    root .;
+}
+
+path /static2 StaticFileHandler {
     root static_files;
 }
 
