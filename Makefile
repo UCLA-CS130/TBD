@@ -14,7 +14,7 @@ GMOCK_DIR=googletest/googlemock
 CPPFLAGS += -isystem $(GTEST_DIR)/include -isystem $(GMOCK_DIR)/include
 
 # Flags passed to the C++ compiler.
-CXXFLAGS += -g -Wall -Wextra -Werror -static-libgcc -static-libstdc++ -pthread -Wl,-Bstatic -std=c++0x
+CXXFLAGS += -g -Wall -Wextra -Werror -static-libgcc -static-libstdc++ -pthread -Wl,-Bstatic -lm -std=c++0x
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -44,7 +44,8 @@ clean:
 deploy:
 	docker build -t httpserver.build . ; \
 	docker run httpserver.build > ./deploy/binary.tar; tar -xvf ./deploy/binary.tar -C ./deploy; \
-	docker build -t httpserver -f deploy/Dockerfile.run ./deploy; rm -f ./deploy/binary.tar
+	docker build -t httpserver -f deploy/Dockerfile.run ./deploy; rm -f ./deploy/binary.tar; \
+	docker save httpserver | bzip2 | ssh -i cs130.pem ubuntu@ec2-54-202-151-253.us-west-2.compute.amazonaws.com 'bunzip2 | docker load; exit;'
 
 server: server_main.o server.o config_parser.o echo_handler.o request_handler.o static_file_handler.o not_found_handler.o \
 		status_counter.o status_handler.o reverse_proxy_handler.o redirect_handler.o
