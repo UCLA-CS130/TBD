@@ -1,0 +1,37 @@
+port 8080;
+
+path /foo EchoHandler {
+    root .;
+}
+
+path /static1 StaticFileHandler {
+    root .;
+}
+
+path /static2 StaticFileHandler {
+    root static_files;
+}
+
+path /status StatusHandler {
+    root .;
+}
+
+path /simple_proxy ReverseProxyHandler {
+    remote_host localhost:8081;
+}
+
+path /redirect_proxy ReverseProxyHandler {
+    remote_host localhost:8081/redirect;
+}
+
+path /reverse_proxy ReverseProxyHandler {
+    remote_host www.ucla.edu;
+}
+
+path /redirect RedirectHandler {
+    url http://www.ucla.edu; # note: must have http:// in front of it
+}
+
+default NotFoundHandler {
+    root .;
+}

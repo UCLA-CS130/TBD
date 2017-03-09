@@ -36,6 +36,15 @@ make integration
 ./server <config_file>
 ```
 
+### To build the docker image for deployment
+```
+make deploy
+```
+
+### To run the docker container
+```
+docker run --rm -t -p 8080:8080 httpserver
+```
 
 ## Source Code Layout
 * All the source code is in the base directory.
