@@ -77,7 +77,7 @@ StaticFileHandler::Status StaticFileHandler::HandleRequest(const Request& reques
     }
 }
 
-std::string StaticFileHandler::ProcessMarkdown(std::string content) {
+std::string StaticFileHandler::ProcessMarkdown(const std::string& content) {
     // Use cpp-markdown to render md file as html
     markdown::Document doc;
     doc.read(content);
