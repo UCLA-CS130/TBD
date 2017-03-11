@@ -8,3 +8,5 @@ server
 *.gcno
 *.gcov
 *.dSYM/
+*.pem
+*.ppk
