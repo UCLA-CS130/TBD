@@ -4,7 +4,7 @@
 	See the provided LICENSE.TXT file for details.
 */
 
-#include "markdown-tokens.h"
+#include "markdown_tokens.h"
 
 #include <stack>
 

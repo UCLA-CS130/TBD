@@ -5,7 +5,7 @@
 */
 
 #include "markdown.h"
-#include "markdown-tokens.h"
+#include "markdown_tokens.h"
 
 #include <sstream>
 #include <cassert>
