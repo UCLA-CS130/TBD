@@ -49,7 +49,7 @@ deploy:
 
 server: server_main.o server.o config_parser.o echo_handler.o request_handler.o static_file_handler.o not_found_handler.o \
 		status_counter.o status_handler.o reverse_proxy_handler.o redirect_handler.o markdown.o markdown_tokens.o
-	$(CXX) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system -lboost_regex
+	$(CXX) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system -lboost_regex -lboost_iostreams -lz
 
 config_parser: config_parser.cc config_parser_main.cc
 	g++ config_parser.cc config_parser_main.cc -std=c++0x -g -Wall -o config_parser
