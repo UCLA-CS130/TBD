@@ -7,7 +7,8 @@ protected:
         return static_file_handler_.GetName();
     }
     std::string GetMimeType(const std::string& path) {
-        return static_file_handler_.GetMimeType(path);
+        bool isMarkdown = false;
+        return static_file_handler_.GetMimeType(path, isMarkdown);
     }
     bool ReadFile(const std::string& path, std::string& content) {
         return static_file_handler_.ReadFile(path, content);
