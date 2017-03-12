@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
-#include "status_counter.h
+#include "status_counter.h"
 
 /* Currently no unit testing done on StatusCounter
  *
