@@ -68,8 +68,7 @@ StaticFileHandler::Status StaticFileHandler::HandleRequest(const Request& reques
         }
         response->AddHeader("Content-Type", content_type);
 
-        Compressor compressor;
-        std::string compressed_file_content = compressor.compress(file_content);
+        std::string compressed_file_content = Compressor::compress(file_content);
         response->AddHeader("Content-Encoding", "gzip");
         response->SetBody(compressed_file_content);
         return OK;

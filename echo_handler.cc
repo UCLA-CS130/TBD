@@ -16,8 +16,7 @@ EchoHandler::Status EchoHandler::HandleRequest(const Request& request, Response*
     response->SetStatus(Response::ResponseCode::OK);
     response->AddHeader("Content-Type", "text/plain");
 
-    Compressor compressor;
-    std::string compressed_string = compressor.compress(request.raw_request());
+    std::string compressed_string = Compressor::compress(request.raw_request());
     
     response->AddHeader("Content-Encoding", "gzip");
     response->SetBody(compressed_string);
