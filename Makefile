@@ -92,21 +92,24 @@ $(basename $(wildcard %.o)) : %.cc
 $(basename $(wildcard %_test.o)) : %_test.cc $(GMOCK_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c %_test.cc
 
-request_handler_test : request_handler_test.o request_handler.o echo_handler.o static_file_handler.o not_found_handler.o status_handler.o status_counter.o gmock_main.a markdown.o markdown_tokens.o
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system -lboost_regex
+request_handler_test : request_handler_test.o request_handler.o echo_handler.o static_file_handler.o not_found_handler.o \
+						status_handler.o status_counter.o gmock_main.a markdown.o markdown_tokens.o compressor.o
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system -lboost_regex -lboost_iostreams -lz
 
-echo_handler_test : echo_handler_test.o echo_handler.o request_handler.o gmock_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
+echo_handler_test : echo_handler_test.o echo_handler.o request_handler.o compressor.o gmock_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system -lboost_iostreams -lz
 
 server_test : config_parser.o server.o server_test.o request_handler.o echo_handler.o  static_file_handler.o \
-				 status_counter.o status_handler.o not_found_handler.o gmock_main.a reverse_proxy_handler.o redirect_handler.o markdown.o markdown_tokens.o
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system -lboost_regex
+				status_counter.o status_handler.o not_found_handler.o gmock_main.a reverse_proxy_handler.o \
+				redirect_handler.o markdown.o markdown_tokens.o compressor.o
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system -lboost_regex -lboost_iostreams -lz
 
 config_parser_test : config_parser.o config_parser_test.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
-static_file_handler_test : static_file_handler.o static_file_handler_test.o request_handler.o not_found_handler.o markdown.o markdown_tokens.o gmock_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system -lboost_regex
+static_file_handler_test : static_file_handler.o static_file_handler_test.o request_handler.o not_found_handler.o \
+							markdown.o markdown_tokens.o compressor.o gmock_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system -lboost_regex -lboost_iostreams -lz
 
 not_found_handler_test : not_found_handler_test.o not_found_handler.o request_handler.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
@@ -136,6 +139,7 @@ coverage : test
 	gcov -r echo_handler.cc; gcov -r request_handler.cc; \
 	gcov -r static_file_handler.cc; gcov -r status_handler.cc; \
 	gcov -r not_found_handler.cc; gcov -r status_counter.cc;
+	gcov -r compressor.cc;
 
 integration : 
 	make clean && make;
