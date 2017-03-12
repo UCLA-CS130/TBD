@@ -8,7 +8,7 @@
 
 class Compressor {
 public:
-    std::string compress(const std::string& original);
+    static std::string compress(const std::string& original);
 };
 
 #endif
