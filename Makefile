@@ -126,10 +126,14 @@ redirect_handler_test : redirect_handler_test.o redirect_handler.o request_handl
 reverse_proxy_handler_test : reverse_proxy_handler_test.o reverse_proxy_handler.o request_handler.o config_parser.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
+compressor_test : compressor.o compressor_test.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system -lboost_iostreams -lz
+
 TESTS = config_parser_test server_test echo_handler_test \
 		request_handler_test static_file_handler_test \
 		not_found_handler_test status_handler_test \
-		redirect_handler_test reverse_proxy_handler_test
+		redirect_handler_test reverse_proxy_handler_test \
+		compressor_test
 test : $(TESTS)
 	for t in $^ ; do ./$$t ; done
 
