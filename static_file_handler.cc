@@ -2,6 +2,7 @@
 #include "static_file_handler.h"
 #include "not_found_handler.h"
 #include "markdown.h"
+#include "compressor.h"
 
 StaticFileHandler::StaticFileHandler() {}
 
@@ -66,8 +67,10 @@ StaticFileHandler::Status StaticFileHandler::HandleRequest(const Request& reques
             file_content = ProcessMarkdown(file_content);
         }
         response->AddHeader("Content-Type", content_type);
-        response->SetBody(file_content);
 
+        std::string compressed_file_content = Compressor::compress(file_content);
+        response->AddHeader("Content-Encoding", "gzip");
+        response->SetBody(compressed_file_content);
         return OK;
     } else {
         response->SetStatus(Response::ResponseCode::FILE_NOT_FOUND);

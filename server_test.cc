@@ -18,7 +18,7 @@ protected:
 };
 
 TEST_F(ServerTest, HandleReadSimpleSuccess) {
-    std::string expected_response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nGET /foo HTTP/1.1\r\nHost: localhost:8080\r\n\r\n";
+    std::string expected_response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: gzip\r\n\r\n\x1F\x8B\b\0\0\0\0\0\x2\xFFsw\rQ\xD0O\xCB\xCFW\xF0\b\t\t\xD0\" \"7\xD4\" \"3\xE4\xE5\xF2\xC8/.\xB1R\xC8\xC9ON\xCC\xC9\01-\f,\fx\xB9x\xB9\0;\xEF(\x9D+\0\0\0";
     std::string actual_response = handle_read("GET /foo HTTP/1.1\r\nHost: localhost:8080\r\n\r\n");
-    EXPECT_EQ(expected_response, actual_response);
+    EXPECT_STREQ(expected_response.c_str(), actual_response.c_str());
 }

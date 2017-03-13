@@ -48,8 +48,8 @@ deploy:
 	docker save httpserver | bzip2 | ssh -i cs130.pem ubuntu@ec2-54-202-151-253.us-west-2.compute.amazonaws.com 'bunzip2 | docker load; docker stop httpserver; docker rm -f `docker ps -aq -f name=httpserver`; docker run --name=httpserver --rm -t -p 80:8080 httpserver;'
 
 server: server_main.o server.o config_parser.o echo_handler.o request_handler.o static_file_handler.o not_found_handler.o \
-		status_counter.o status_handler.o reverse_proxy_handler.o redirect_handler.o markdown.o markdown_tokens.o
-	$(CXX) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system -lboost_regex
+		status_counter.o status_handler.o reverse_proxy_handler.o redirect_handler.o markdown.o markdown_tokens.o compressor.o
+	$(CXX) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system -lboost_regex -lboost_iostreams -lz
 
 config_parser: config_parser.cc config_parser_main.cc
 	g++ config_parser.cc config_parser_main.cc -std=c++0x -g -Wall -o config_parser
@@ -92,21 +92,24 @@ $(basename $(wildcard %.o)) : %.cc
 $(basename $(wildcard %_test.o)) : %_test.cc $(GMOCK_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c %_test.cc
 
-request_handler_test : request_handler_test.o request_handler.o echo_handler.o static_file_handler.o not_found_handler.o status_handler.o status_counter.o gmock_main.a markdown.o markdown_tokens.o
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system -lboost_regex
+request_handler_test : request_handler_test.o request_handler.o echo_handler.o static_file_handler.o not_found_handler.o \
+						status_handler.o status_counter.o gmock_main.a markdown.o markdown_tokens.o compressor.o
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system -lboost_regex -lboost_iostreams -lz
 
-echo_handler_test : echo_handler_test.o echo_handler.o request_handler.o gmock_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
+echo_handler_test : echo_handler_test.o echo_handler.o request_handler.o compressor.o gmock_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system -lboost_iostreams -lz
 
 server_test : config_parser.o server.o server_test.o request_handler.o echo_handler.o  static_file_handler.o \
-				 status_counter.o status_handler.o not_found_handler.o gmock_main.a reverse_proxy_handler.o redirect_handler.o markdown.o markdown_tokens.o
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system -lboost_regex
+				status_counter.o status_handler.o not_found_handler.o gmock_main.a reverse_proxy_handler.o \
+				redirect_handler.o markdown.o markdown_tokens.o compressor.o
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system -lboost_regex -lboost_iostreams -lz
 
 config_parser_test : config_parser.o config_parser_test.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
-static_file_handler_test : static_file_handler.o static_file_handler_test.o request_handler.o not_found_handler.o markdown.o markdown_tokens.o gmock_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system -lboost_regex
+static_file_handler_test : static_file_handler.o static_file_handler_test.o request_handler.o not_found_handler.o \
+							markdown.o markdown_tokens.o compressor.o gmock_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system -lboost_regex -lboost_iostreams -lz
 
 not_found_handler_test : not_found_handler_test.o not_found_handler.o request_handler.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
@@ -123,19 +126,24 @@ redirect_handler_test : redirect_handler_test.o redirect_handler.o request_handl
 reverse_proxy_handler_test : reverse_proxy_handler_test.o reverse_proxy_handler.o request_handler.o config_parser.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
+compressor_test : compressor.o compressor_test.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system -lboost_iostreams -lz
+
 TESTS = config_parser_test server_test echo_handler_test \
 		request_handler_test static_file_handler_test \
 		not_found_handler_test status_handler_test \
-		redirect_handler_test reverse_proxy_handler_test
+		redirect_handler_test reverse_proxy_handler_test \
+		compressor_test
 test : $(TESTS)
 	for t in $^ ; do ./$$t ; done
 
 coverage : CXXFLAGS += -fprofile-arcs -ftest-coverage
-coverage : test
+coverage : clean test
 	gcov -r server.cc; gcov -r config_parser.cc; \
 	gcov -r echo_handler.cc; gcov -r request_handler.cc; \
 	gcov -r static_file_handler.cc; gcov -r status_handler.cc; \
-	gcov -r not_found_handler.cc; gcov -r status_counter.cc;
+	gcov -r not_found_handler.cc; gcov -r status_counter.cc; \
+	gcov -r compressor.cc; gcov -r redirect_handler.cc; gcov -r reverse_proxy_handler.cc;
 
 integration : 
 	make clean && make;
