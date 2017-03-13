@@ -22,17 +22,19 @@ telnet_request_proc = subprocess.Popen(telnet_request_command, stdout=subprocess
 
 # Echo handler test
 # Spawn a shell process to curl to echo handler endpoint
-echo_request_command = "curl -i localhost:8080/foo"
+echo_request_command = "curl --compressed -i localhost:8080/foo"
 echo_request_proc = subprocess.Popen(echo_request_command, stdout=subprocess.PIPE, shell=True)
 echo_response = echo_request_proc.stdout.read().decode('utf-8')
 
 expected_echo_response = """HTTP/1.1 200 OK\r
 Content-Type: text/plain\r
+Content-Encoding: gzip\r
 \r
 GET /foo HTTP/1.1\r
 User-Agent: curl/7.35.0\r
 Host: localhost:8080\r
-Accept: */*\r\n\r\n"""
+Accept: */*\r
+Accept-Encoding: deflate, gzip\r\n\r\n"""
 
 # Terminate server process before exiting
 os.killpg(os.getpgid(server_proc.pid), signal.SIGTERM)

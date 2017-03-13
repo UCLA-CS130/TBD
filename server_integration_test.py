@@ -11,17 +11,19 @@ test_failed = False
 
 # Echo handler test
 # Spawn a shell process to curl to echo handler endpoint
-echo_request_command = "curl -i -s localhost:8080/foo"
+echo_request_command = "curl --compressed -i -s localhost:8080/foo"
 echo_request_proc = subprocess.Popen(echo_request_command, stdout=subprocess.PIPE, shell=True)
 echo_response = echo_request_proc.stdout.read().decode('utf-8')
 
 expected_echo_response = """HTTP/1.1 200 OK\r
 Content-Type: text/plain\r
+Content-Encoding: gzip\r
 \r
 GET /foo HTTP/1.1\r
 User-Agent: curl/7.35.0\r
 Host: localhost:8080\r
-Accept: */*\r\n\r\n"""
+Accept: */*\r
+Accept-Encoding: deflate, gzip\r\n\r\n"""
 
 if echo_response != expected_echo_response:
     print("ERROR: Echo handler replied with an incorrect response.")
@@ -31,12 +33,13 @@ else:
 
 # Static File handler test: mapping static2
 # Spawn a shell process to curl to static file handler endpoint with path under static2/
-static2_file_request_command = "curl -i -s localhost:8080/static2/test.txt"
+static2_file_request_command = "curl --compressed -i -s localhost:8080/static2/test.txt"
 static2_file_request_proc = subprocess.Popen(static2_file_request_command, stdout=subprocess.PIPE, shell=True)
 static2_response = static2_file_request_proc.stdout.read().decode('utf-8')
 
 expected_static2_response = """HTTP/1.1 200 OK\r
 Content-Type: text/plain\r
+Content-Encoding: gzip\r
 \r
 Test file this is\n"""
 
@@ -48,12 +51,13 @@ else:
 
 # Static File handler test: mapping static1
 # Spawn a shell process to curl to static file handler endpoint with path under static1/
-static1_file_request_command = "curl -i -s localhost:8080/static1/test.txt"
+static1_file_request_command = "curl --compressed -i -s localhost:8080/static1/test.txt"
 static1_file_request_proc = subprocess.Popen(static1_file_request_command, stdout=subprocess.PIPE, shell=True)
 static1_response = static1_file_request_proc.stdout.read().decode('utf-8')
 
 expected_static1_response = """HTTP/1.1 200 OK\r
 Content-Type: text/plain\r
+Content-Encoding: gzip\r
 \r
 HEY!\n\n"""
 
@@ -101,10 +105,10 @@ else:
 # Run two instances of the web server, with one configured as a proxy
 # Make a request to the proxy, which then directs to the backend server
 # The response should be the same as backend being requested from directly
-proxy_request_command = "curl -i -s localhost:8080/simple_proxy/static/index.html"
+proxy_request_command = "curl --compressed -i -s localhost:8080/simple_proxy/static/index.html"
 proxy_request_proc = subprocess.Popen(proxy_request_command, stdout=subprocess.PIPE, shell=True)
 proxy_response = proxy_request_proc.stdout.read().decode('utf-8')
-backend_request_command = "curl -i -s localhost:8081/static/index.html"
+backend_request_command = "curl --compressed -i -s localhost:8081/static/index.html"
 backend_request_proc = subprocess.Popen(backend_request_command, stdout=subprocess.PIPE, shell=True)
 backend_response = backend_request_proc.stdout.read().decode('utf-8')
 
@@ -118,17 +122,19 @@ else:
 # Run two instances of the web server, with one configured as a proxy
 # Make a request to the proxy, which is a redirect to echo request
 # The response should be the same as backend being requested from directly
-proxy_redirect_request_command = "curl -i -s localhost:8080/redirect_proxy/"
+proxy_redirect_request_command = "curl --compressed -i -s localhost:8080/redirect_proxy/"
 proxy_redirect_request_proc = subprocess.Popen(proxy_redirect_request_command, stdout=subprocess.PIPE, shell=True)
 proxy_redirect_response = proxy_redirect_request_proc.stdout.read().decode('utf-8')
 
 expected_proxy_redirect_response = """HTTP/1.1 200 OK\r
 Content-Type: text/plain\r
+Content-Encoding: gzip\r
 \r
 GET /echo/ HTTP/1.1\r
 Host: localhost: 8081\r
 User-Agent: curl/7.35.0\r
-Accept: */*\r\n\r\n"""
+Accept: */*\r
+Accept-Encoding: deflate, gzip\r\n\r\n"""
 
 if proxy_redirect_response != expected_proxy_redirect_response:
     print("ERROR: Proxy handler replied with an incorrect response for redirect_proxy/")
