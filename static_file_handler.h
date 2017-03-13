@@ -13,6 +13,8 @@ public:
     bool ReadFile(const std::string& file_path, std::string& file_content);
     virtual Status Init(const std::string& uri_prefix, const NginxConfig& config);
     virtual Status HandleRequest(const Request& request, Response* response);
+    bool IsMarkdown(const std::string& file_path);
+    std::string ProcessMarkdown(const std::string& content);
     virtual std::string GetName();
 private:
     std::string uri_prefix_;

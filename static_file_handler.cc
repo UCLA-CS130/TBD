@@ -1,5 +1,7 @@
+#include <sstream>
 #include "static_file_handler.h"
 #include "not_found_handler.h"
+#include "markdown.h"
 
 StaticFileHandler::StaticFileHandler() {}
 
@@ -14,14 +16,17 @@ std::string StaticFileHandler::GetMimeType(const std::string& file_path) {
 
     std::string extension = file_path.substr(pos);
 
-    if (extension == ".html")
+    if (extension == ".html") {
         return "text/html";
-    else if (extension == ".txt")
+    } else if (extension == ".txt") {
         return "text/plain";
-    else if (extension == ".jpeg" || extension == ".jpg")
+    } else if (extension == ".jpeg" || extension == ".jpg") {
         return "image/jpeg";
-    else
+    } else if (extension == ".md") {
+        return "text/html";
+    } else {
         return "";
+    }
 }
 
 bool StaticFileHandler::ReadFile(const std::string& file_path, std::string& file_content) {
@@ -57,13 +62,35 @@ StaticFileHandler::Status StaticFileHandler::HandleRequest(const Request& reques
         response->SetStatus(Response::ResponseCode::OK);
 
         std::string content_type = GetMimeType(file_path);
+        if (IsMarkdown(file_path)) {
+            file_content = ProcessMarkdown(file_content);
+        }
         response->AddHeader("Content-Type", content_type);
         response->SetBody(file_content);
+
         return OK;
     } else {
         response->SetStatus(Response::ResponseCode::FILE_NOT_FOUND);
         return FILE_NOT_FOUND;
     }
+}
+
+bool StaticFileHandler::IsMarkdown(const std::string& file_path) {
+    int length = file_path.size();
+    if (length >= 3 && file_path.substr(length - 3) == ".md") {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+std::string StaticFileHandler::ProcessMarkdown(const std::string& content) {
+    // Use cpp-markdown to render md file as html
+    markdown::Document doc;
+    doc.read(content);
+    std::ostringstream oss;
+    doc.write(oss);
+    return oss.str();
 }
 
 std::string StaticFileHandler::GetName() {

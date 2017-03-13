@@ -48,8 +48,8 @@ deploy:
 	docker save httpserver | bzip2 | ssh -i cs130.pem ubuntu@ec2-54-202-151-253.us-west-2.compute.amazonaws.com 'bunzip2 | docker load; docker stop httpserver; docker rm -f `docker ps -aq -f name=httpserver`; docker run --name=httpserver --rm -t -p 80:8080 httpserver;'
 
 server: server_main.o server.o config_parser.o echo_handler.o request_handler.o static_file_handler.o not_found_handler.o \
-		status_counter.o status_handler.o reverse_proxy_handler.o redirect_handler.o
-	$(CXX) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
+		status_counter.o status_handler.o reverse_proxy_handler.o redirect_handler.o markdown.o markdown_tokens.o
+	$(CXX) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system -lboost_regex
 
 config_parser: config_parser.cc config_parser_main.cc
 	g++ config_parser.cc config_parser_main.cc -std=c++0x -g -Wall -o config_parser
@@ -92,27 +92,27 @@ $(basename $(wildcard %.o)) : %.cc
 $(basename $(wildcard %_test.o)) : %_test.cc $(GMOCK_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c %_test.cc
 
-request_handler_test : request_handler_test.o request_handler.o echo_handler.o static_file_handler.o not_found_handler.o status_handler.o status_counter.o gmock_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
+request_handler_test : request_handler_test.o request_handler.o echo_handler.o static_file_handler.o not_found_handler.o status_handler.o status_counter.o gmock_main.a markdown.o markdown_tokens.o
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system -lboost_regex
 
 echo_handler_test : echo_handler_test.o echo_handler.o request_handler.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
 server_test : config_parser.o server.o server_test.o request_handler.o echo_handler.o  static_file_handler.o \
-				 status_counter.o status_handler.o not_found_handler.o gmock_main.a reverse_proxy_handler.o redirect_handler.o
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
+				 status_counter.o status_handler.o not_found_handler.o gmock_main.a reverse_proxy_handler.o redirect_handler.o markdown.o markdown_tokens.o
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system -lboost_regex
 
 config_parser_test : config_parser.o config_parser_test.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
-static_file_handler_test : static_file_handler.o static_file_handler_test.o request_handler.o not_found_handler.o gmock_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
+static_file_handler_test : static_file_handler.o static_file_handler_test.o request_handler.o not_found_handler.o markdown.o markdown_tokens.o gmock_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system -lboost_regex
 
 not_found_handler_test : not_found_handler_test.o not_found_handler.o request_handler.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
 
-status_handler_test : status_handler_test.o status_handler.o request_handler.o status_counter.o gmock_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
+status_handler_test : status_handler_test.o status_handler.o request_handler.o status_counter.o gmock_main.a markdown.o markdown_tokens.o
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system -lboost_regex
 
 status_counter_test : status_counter_test.o status_counter.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system
