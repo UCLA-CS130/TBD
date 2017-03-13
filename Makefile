@@ -48,7 +48,7 @@ deploy:
 	docker save httpserver | bzip2 | ssh -i cs130.pem ubuntu@ec2-54-202-151-253.us-west-2.compute.amazonaws.com 'bunzip2 | docker load; docker stop httpserver; docker rm -f `docker ps -aq -f name=httpserver`; docker run --name=httpserver --rm -t -p 80:8080 httpserver;'
 
 server: server_main.o server.o config_parser.o echo_handler.o request_handler.o static_file_handler.o not_found_handler.o \
-		status_counter.o status_handler.o reverse_proxy_handler.o redirect_handler.o markdown.o markdown_tokens.o
+		status_counter.o status_handler.o reverse_proxy_handler.o redirect_handler.o markdown.o markdown_tokens.o compressor.o
 	$(CXX) $(CXXFLAGS) -lpthread $^ -o $@ -lboost_system -lboost_regex -lboost_iostreams -lz
 
 config_parser: config_parser.cc config_parser_main.cc
