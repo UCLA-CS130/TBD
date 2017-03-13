@@ -7,7 +7,7 @@ StaticFileHandler::StaticFileHandler() {}
 
 StaticFileHandler::~StaticFileHandler() {}
 
-std::string StaticFileHandler::GetMimeType(const std::string& file_path, bool &isMarkdown) {
+std::string StaticFileHandler::GetMimeType(const std::string& file_path) {
     size_t pos = file_path.find_last_of(".");
     
     if (pos == std::string::npos || pos == 0) {
@@ -23,7 +23,6 @@ std::string StaticFileHandler::GetMimeType(const std::string& file_path, bool &i
     } else if (extension == ".jpeg" || extension == ".jpg") {
         return "image/jpeg";
     } else if (extension == ".md") {
-        isMarkdown = true;
         return "text/html";
     } else {
         return "";
@@ -62,9 +61,8 @@ StaticFileHandler::Status StaticFileHandler::HandleRequest(const Request& reques
     if (ReadFile(file_path, file_content)) {
         response->SetStatus(Response::ResponseCode::OK);
 
-        bool isMarkdown = false;
-        std::string content_type = GetMimeType(file_path, isMarkdown);
-        if (isMarkdown) {
+        std::string content_type = GetMimeType(file_path);
+        if (IsMarkdown(file_path)) {
             file_content = ProcessMarkdown(file_content);
         }
         response->AddHeader("Content-Type", content_type);
@@ -74,6 +72,15 @@ StaticFileHandler::Status StaticFileHandler::HandleRequest(const Request& reques
     } else {
         response->SetStatus(Response::ResponseCode::FILE_NOT_FOUND);
         return FILE_NOT_FOUND;
+    }
+}
+
+bool StaticFileHandler::IsMarkdown(const std::string& file_path) {
+    int length = file_path.size();
+    if (length >= 3 && file_path.substr(length - 3) == ".md") {
+        return true;
+    } else {
+        return false;
     }
 }
 

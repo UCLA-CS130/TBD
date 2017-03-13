@@ -7,8 +7,7 @@ protected:
         return static_file_handler_.GetName();
     }
     std::string GetMimeType(const std::string& path) {
-        bool isMarkdown = false;
-        return static_file_handler_.GetMimeType(path, isMarkdown);
+        return static_file_handler_.GetMimeType(path);
     }
     bool ReadFile(const std::string& path, std::string& content) {
         return static_file_handler_.ReadFile(path, content);
@@ -21,6 +20,9 @@ protected:
     }
     std::string ProcessMarkdown(const std::string& content) {
         return static_file_handler_.ProcessMarkdown(content);
+    }
+    bool IsMarkdown(const std::string& file_path) {
+        return static_file_handler_.IsMarkdown(file_path);
     }
     StaticFileHandler static_file_handler_;
 };
@@ -47,6 +49,14 @@ TEST_F(StaticFileHandlerTest, GetMimeTypeTestDefault) {
 
 TEST_F(StaticFileHandlerTest, GetMimeTypeTestMarkdown) {
     EXPECT_EQ("text/html", GetMimeType("lama.md"));
+}
+
+TEST_F(StaticFileHandlerTest, IsMarkdownTestTrue) {
+    EXPECT_TRUE(IsMarkdown("a.md"));
+}
+
+TEST_F(StaticFileHandlerTest, IsMarkdownTestFalse) {
+    EXPECT_FALSE(IsMarkdown("a.txt"));
 }
 
 TEST_F(StaticFileHandlerTest, ReadFileSuccessTest) {
