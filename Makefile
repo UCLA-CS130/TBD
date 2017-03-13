@@ -138,12 +138,12 @@ test : $(TESTS)
 	for t in $^ ; do ./$$t ; done
 
 coverage : CXXFLAGS += -fprofile-arcs -ftest-coverage
-coverage : test
+coverage : clean test
 	gcov -r server.cc; gcov -r config_parser.cc; \
 	gcov -r echo_handler.cc; gcov -r request_handler.cc; \
 	gcov -r static_file_handler.cc; gcov -r status_handler.cc; \
-	gcov -r not_found_handler.cc; gcov -r status_counter.cc;
-	gcov -r compressor.cc;
+	gcov -r not_found_handler.cc; gcov -r status_counter.cc; \
+	gcov -r compressor.cc; gcov -r redirect_handler.cc; gcov -r reverse_proxy_handler.cc;
 
 integration : 
 	make clean && make;
